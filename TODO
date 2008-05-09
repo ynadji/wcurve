@@ -1,0 +1,36 @@
+SOFTWARE
+1. DONE Fix File Saving
+2. Fix last vector bug on initial renders
+3. Implement file parseing system (*.seq), (*.fasta) etc
+4. Color code genes
+5. LINE WRAP FOR THE LOVE OF GOD
+6. Printing functionality
+7. DONE In lieu of printing we need option to switch from white to black background
+8. LOD Algorithm
+9. Debug file closing and clean program shutdown
+10. Color-code genes in text sequence and use a monospace font
+11. Selection mechanism
+12 Pattern searching mechanism
+13 Access to remote databases such as Genbank to download sequences
+14. GNUPlot interaction
+15. Super impose curves
+16. DONE Orthographic projection
+17. Clean up QList searches
+18. Add Camera coords to file saving
+19. Chaos Game representation
+20. progress bar when rendering large sequences
+21 fix erratic z-axis line bug upon initial file opening
+22. DONE clean up the projection menu selection
+23. After saving file windows only show .wcv
+
+SOFTWARE ENGINEERING
+1. DONE Automate cvs commmit notification
+2. Requirements doc
+3. Design Doc
+4. Feature test doc
+5. Coding Standard
+6. User manual
+7. Website
+8. cron job to build rpm
+9. uprev code to match standard
+10. Set up everything on bioinformaitcs.org (DONE lists, DONE forums, DONE cvs, bug tracking)
