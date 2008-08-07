@@ -1,0 +1,495 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.6	//
+A	wcurve/nogapparser.h	/^  Vector3D<float> *A;$/;"	m	class:NoGapParser
+A	wcurve/origingapparser.h	/^  Vector3D<float> *A;$/;"	m	class:OriginGapParser
+A	wcurve/pentagapparser.h	/^  Vector3D<float> *A;$/;"	m	class:PentaGapParser
+A	wcurve/repeatgapparser.h	/^  Vector3D<float> *A;$/;"	m	class:RepeatGapParser
+BLACK	wcurve/plotview.h	/^enum {BLACK, WHITE};$/;"	e	enum:__anon5
+BLUE	wcurve/globaltypes.h	/^enum {RED, GREEN, BLUE};$/;"	e	enum:__anon1
+C	wcurve/nogapparser.h	/^  Vector3D<float> *C;$/;"	m	class:NoGapParser
+C	wcurve/origingapparser.h	/^  Vector3D<float> *C;$/;"	m	class:OriginGapParser
+C	wcurve/pentagapparser.h	/^  Vector3D<float> *C;$/;"	m	class:PentaGapParser
+C	wcurve/repeatgapparser.h	/^  Vector3D<float> *C;$/;"	m	class:RepeatGapParser
+C1	wcurve/pentagapparser.cpp	21;"	d	file:
+C2	wcurve/pentagapparser.cpp	22;"	d	file:
+Camera	wcurve/plotview.h	/^struct Camera {$/;"	s
+Circle	wcurve/plotview.h	/^typedef  CGAL:: Min_circle_2<Traits>::Circle Circle;$/;"	t
+DEBUG_STR_DEFAULT	wcurve/globaltypes.h	44;"	d
+DISPLAYLIST_H	wcurve/displaylist.h	19;"	d
+DisplayList	wcurve/displaylist.cpp	/^DisplayList::DisplayList(){$/;"	f	class:DisplayList
+DisplayList	wcurve/displaylist.h	/^class DisplayList {$/;"	c
+FILTER_SIZE	wcurve/globaltypes.h	21;"	d
+FOREVER	wcurve/globaltypes.h	35;"	d
+G	wcurve/nogapparser.h	/^	Vector3D<float> *G;$/;"	m	class:NoGapParser
+G	wcurve/origingapparser.h	/^	Vector3D<float> *G;$/;"	m	class:OriginGapParser
+G	wcurve/pentagapparser.h	/^	Vector3D<float> *G;$/;"	m	class:PentaGapParser
+G	wcurve/repeatgapparser.h	/^	Vector3D<float> *G;$/;"	m	class:RepeatGapParser
+GAMMA_MAX	wcurve/wcurve.h	61;"	d
+GAMMA_MIN	wcurve/wcurve.h	60;"	d
+GAMMA_STEP	wcurve/wcurve.h	62;"	d
+GAP	wcurve/origingapparser.h	/^  Vector3D<float> *GAP;$/;"	m	class:OriginGapParser
+GAP	wcurve/pentagapparser.h	/^  Vector3D<float> *GAP;$/;"	m	class:PentaGapParser
+GLOBAL_H	wcurve/globaltypes.h	19;"	d
+GL_PI	wcurve/globaltypes.h	22;"	d
+GREEN	wcurve/globaltypes.h	/^enum {RED, GREEN, BLUE};$/;"	e	enum:__anon1
+GRID_SIZE	wcurve/plotview.h	51;"	d
+K	wcurve/plotview.h	/^typedef  CGAL::Cartesian<float>           K;$/;"	t
+LEFT	wcurve/plotview.h	/^enum {LEFT, RIGHT, MIDDLE};$/;"	e	enum:__anon3
+MASK_SUBDIV	wcurve/plotview.h	62;"	d
+MIDDLE	wcurve/plotview.h	/^enum {LEFT, RIGHT, MIDDLE};$/;"	e	enum:__anon3
+Min_circle	wcurve/plotview.h	/^typedef  CGAL::Min_circle_2<Traits>      Min_circle;$/;"	t
+NOGAP	wcurve/globaltypes.h	/^enum ViewID{NOGAP, REPEATGAP, ORIGINGAP, PENTAGAP, SEQUENCE};$/;"	e	enum:ViewID
+NOGAPPARSER_H	wcurve/nogapparser.h	19;"	d
+NOGAP_STRING	wcurve/globaltypes.h	38;"	d
+NoGapParser	wcurve/nogapparser.cpp	/^NoGapParser::NoGapParser(){$/;"	f	class:NoGapParser
+NoGapParser	wcurve/nogapparser.h	/^class NoGapParser : public SequenceParser  {$/;"	c
+ORIGINGAP	wcurve/globaltypes.h	/^enum ViewID{NOGAP, REPEATGAP, ORIGINGAP, PENTAGAP, SEQUENCE};$/;"	e	enum:ViewID
+ORIGINGAPPARSER_H	wcurve/origingapparser.h	19;"	d
+ORIGIN_STRING	wcurve/globaltypes.h	37;"	d
+ORTHOGRAPHIC	wcurve/plotview.h	/^enum {PERSPECTIVE, ORTHOGRAPHIC};$/;"	e	enum:__anon4
+OriginGapParser	wcurve/origingapparser.cpp	/^OriginGapParser::OriginGapParser(){$/;"	f	class:OriginGapParser
+OriginGapParser	wcurve/origingapparser.h	/^class OriginGapParser : public SequenceParser  {$/;"	c
+PENTAGAP	wcurve/globaltypes.h	/^enum ViewID{NOGAP, REPEATGAP, ORIGINGAP, PENTAGAP, SEQUENCE};$/;"	e	enum:ViewID
+PENTAGAPPARSER_H	wcurve/pentagapparser.h	19;"	d
+PENTA_STRING	wcurve/globaltypes.h	40;"	d
+PERSPECTIVE	wcurve/plotview.h	/^enum {PERSPECTIVE, ORTHOGRAPHIC};$/;"	e	enum:__anon4
+PLOTVIEW_H	wcurve/plotview.h	19;"	d
+PentaGapParser	wcurve/pentagapparser.cpp	/^PentaGapParser::PentaGapParser(){$/;"	f	class:PentaGapParser
+PentaGapParser	wcurve/pentagapparser.h	/^class PentaGapParser : public SequenceParser  {$/;"	c
+PlotView	wcurve/plotview.cpp	/^PlotView::PlotView(){$/;"	f	class:PlotView
+PlotView	wcurve/plotview.cpp	/^PlotView::PlotView(SequenceParser *parser, ViewID key, WcurveDoc* pDoc,$/;"	f	class:PlotView
+PlotView	wcurve/plotview.h	/^class PlotView :public virtual QGLWidget, public virtual WcurveView  {$/;"	c
+Point	wcurve/plotview.h	/^typedef  K::Point_2                      Point;$/;"	t
+RED	wcurve/globaltypes.h	/^enum {RED, GREEN, BLUE};$/;"	e	enum:__anon1
+REPEATGAP	wcurve/globaltypes.h	/^enum ViewID{NOGAP, REPEATGAP, ORIGINGAP, PENTAGAP, SEQUENCE};$/;"	e	enum:ViewID
+REPEATGAPPARSER_H	wcurve/repeatgapparser.h	19;"	d
+REPEAT_STRING	wcurve/globaltypes.h	39;"	d
+RIGHT	wcurve/plotview.h	/^enum {LEFT, RIGHT, MIDDLE};$/;"	e	enum:__anon3
+ROT_AMT	wcurve/plotview.h	48;"	d
+RepeatGapParser	wcurve/repeatgapparser.cpp	/^RepeatGapParser::RepeatGapParser(){$/;"	f	class:RepeatGapParser
+RepeatGapParser	wcurve/repeatgapparser.h	/^class RepeatGapParser : public SequenceParser  {$/;"	c
+S1	wcurve/pentagapparser.cpp	23;"	d	file:
+S2	wcurve/pentagapparser.cpp	24;"	d	file:
+SEQUENCE	wcurve/globaltypes.h	/^enum ViewID{NOGAP, REPEATGAP, ORIGINGAP, PENTAGAP, SEQUENCE};$/;"	e	enum:ViewID
+SEQUENCEPARSER_H	wcurve/sequenceparser.h	19;"	d
+SEQUENCEVIEW_H	wcurve/sequenceview.h	19;"	d
+SEQUENCE_STRING	wcurve/globaltypes.h	41;"	d
+SequenceParser	wcurve/sequenceparser.cpp	/^SequenceParser::SequenceParser(int zVal, float gammaVal){$/;"	f	class:SequenceParser
+SequenceParser	wcurve/sequenceparser.h	/^class SequenceParser {$/;"	c
+SequenceView	wcurve/sequenceview.cpp	/^SequenceView::SequenceView(){$/;"	f	class:SequenceView
+SequenceView	wcurve/sequenceview.cpp	/^SequenceView::SequenceView(WcurveDoc *pDoc, ViewID key, QWidget *parent)$/;"	f	class:SequenceView
+SequenceView	wcurve/sequenceview.h	/^class SequenceView : public QTextView, public WcurveView{$/;"	c
+T	wcurve/nogapparser.h	/^  Vector3D<float> *T;$/;"	m	class:NoGapParser
+T	wcurve/origingapparser.h	/^  Vector3D<float> *T;$/;"	m	class:OriginGapParser
+T	wcurve/pentagapparser.h	/^  Vector3D<float> *T;$/;"	m	class:PentaGapParser
+T	wcurve/repeatgapparser.h	/^  Vector3D<float> *T;$/;"	m	class:RepeatGapParser
+TRAN_AMT	wcurve/plotview.h	47;"	d
+Traits	wcurve/plotview.h	/^typedef  CGAL::Min_circle_2_traits_2<K>  Traits;$/;"	t
+VECTOR3D_H	wcurve/vector3d.h	19;"	d
+VERTEX_MAX	wcurve/displaylist.cpp	/^const long DisplayList::VERTEX_MAX = 30000;$/;"	m	class:DisplayList	file:
+VERTEX_MAX	wcurve/displaylist.h	/^  const static long VERTEX_MAX;$/;"	m	class:DisplayList
+Vector3D	wcurve/vector3d.cpp	/^template<class T> Vector3D<T>::Vector3D(T x, T y, T z, T w){$/;"	f	class:Vector3D
+Vector3D	wcurve/vector3d.h	/^class Vector3D {$/;"	c
+ViewID	wcurve/globaltypes.h	/^enum ViewID{NOGAP, REPEATGAP, ORIGINGAP, PENTAGAP, SEQUENCE};$/;"	g
+W	wcurve/vector3d.h	/^  T W;$/;"	m	class:Vector3D
+WCURVEDATA_H	wcurve/wcurvedata.h	19;"	d
+WCURVEDOC_H	wcurve/wcurvedoc.h	19;"	d
+WCURVELISTVIEWITEM_H	wcurve/wcurvelistviewitem.h	19;"	d
+WCURVEVIEW_H	wcurve/wcurveview.h	19;"	d
+WCURVE_DEBUG	wcurve/globaltypes.h	43;"	d
+WCURVE_H	wcurve/wcurve.h	19;"	d
+WHITE	wcurve/plotview.h	/^enum {BLACK, WHITE};$/;"	e	enum:__anon5
+WcurveApp	wcurve/wcurve.cpp	/^WcurveApp::WcurveApp()$/;"	f	class:WcurveApp
+WcurveApp	wcurve/wcurve.h	/^class WcurveApp : public QMainWindow$/;"	c
+WcurveData	wcurve/wcurvedata.cpp	/^WcurveData::WcurveData(){$/;"	f	class:WcurveData
+WcurveData	wcurve/wcurvedata.cpp	/^WcurveData::WcurveData(int nucCount){$/;"	f	class:WcurveData
+WcurveData	wcurve/wcurvedata.h	/^class WcurveData {$/;"	c
+WcurveDoc	wcurve/wcurvedoc.cpp	/^WcurveDoc::WcurveDoc()$/;"	f	class:WcurveDoc
+WcurveDoc	wcurve/wcurvedoc.h	/^class WcurveDoc : public QObject$/;"	c
+WcurveView	wcurve/wcurveview.cpp	/^WcurveView::WcurveView(){$/;"	f	class:WcurveView
+WcurveView	wcurve/wcurveview.cpp	/^WcurveView::WcurveView(WcurveDoc* pDoc, ViewID key)$/;"	f	class:WcurveView
+WcurveView	wcurve/wcurveview.h	/^class WcurveView{$/;"	c
+Wcurvelistviewitem	wcurve/wcurvelistviewitem.cpp	/^Wcurvelistviewitem::Wcurvelistviewitem(QListViewItem* parent, QString name,$/;"	f	class:Wcurvelistviewitem
+Wcurvelistviewitem	wcurve/wcurvelistviewitem.h	/^class Wcurvelistviewitem : public QListViewItem  {$/;"	c
+X	wcurve/plotview.h	/^enum {X, Y, Z};$/;"	e	enum:__anon2
+X	wcurve/vector3d.h	/^  T X;$/;"	m	class:Vector3D
+X_ORI_DEFAULT	wcurve/globaltypes.h	29;"	d
+X_ORI_DEFAULT	wcurve/plotview.h	58;"	d
+X_POS_DEFAULT	wcurve/globaltypes.h	24;"	d
+X_POS_DEFAULT	wcurve/plotview.h	53;"	d
+Y	wcurve/plotview.h	/^enum {X, Y, Z};$/;"	e	enum:__anon2
+Y	wcurve/vector3d.h	/^  T Y;$/;"	m	class:Vector3D
+Y_ORI_DEFAULT	wcurve/globaltypes.h	30;"	d
+Y_ORI_DEFAULT	wcurve/plotview.h	59;"	d
+Y_POS_DEFAULT	wcurve/globaltypes.h	25;"	d
+Y_POS_DEFAULT	wcurve/plotview.h	54;"	d
+Z	wcurve/plotview.h	/^enum {X, Y, Z};$/;"	e	enum:__anon2
+Z	wcurve/vector3d.h	/^  T Z;$/;"	m	class:Vector3D
+ZFAR	wcurve/plotview.h	49;"	d
+Z_ORI_DEFAULT	wcurve/globaltypes.h	31;"	d
+Z_ORI_DEFAULT	wcurve/plotview.h	60;"	d
+Z_POS_DEFAULT	wcurve/globaltypes.h	26;"	d
+Z_POS_DEFAULT	wcurve/plotview.h	55;"	d
+Z_ROT	wcurve/plotview.h	50;"	d
+Z_STEP	wcurve/globaltypes.h	33;"	d
+addMocRules	admin/am_edit	/^sub addMocRules ()$/;"	s
+addMocRules	admin/am_edit	/^sub addMocRules ();$/;"	s
+addVertex	wcurve/displaylist.cpp	/^bool DisplayList::addVertex(Vector3D<float> &vec){$/;"	f	class:DisplayList
+addView	wcurve/wcurvedoc.cpp	/^void WcurveDoc::addView(WcurveView *view)$/;"	f	class:WcurveDoc
+add_makefile	admin/am_edit	/^sub add_makefile ()$/;"	s
+appendLines	admin/am_edit	/^sub appendLines ($)$/;"	s
+appendLines	admin/am_edit	/^sub appendLines ($);$/;"	s
+autoRotate	wcurve/plotview.cpp	/^bool PlotView::autoRotate = false;$/;"	m	class:PlotView	file:
+autoRotate	wcurve/plotview.h	/^  static bool autoRotate;$/;"	m	class:PlotView
+autoZ	wcurve/plotview.cpp	/^float PlotView::autoZ = 0;$/;"	m	class:PlotView	file:
+autoZ	wcurve/plotview.h	/^  static float autoZ;$/;"	m	class:PlotView
+calcSphereCoordinates	wcurve/displaylist.cpp	/^void DisplayList::calcSphereCoordinates(){$/;"	f	class:DisplayList
+canCloseFrame	wcurve/wcurvedoc.cpp	/^bool WcurveDoc::canCloseFrame(WcurveView* pFrame)$/;"	f	class:WcurveDoc
+centerX	wcurve/plotview.h	/^  float centerX, centerY;$/;"	m	class:PlotView
+centerY	wcurve/plotview.h	/^  float centerX, centerY;$/;"	m	class:PlotView
+centerZ	wcurve/displaylist.h	/^  float centerZ;$/;"	m	class:DisplayList
+changedViewList	wcurve/wcurvedoc.cpp	/^void WcurveDoc::changedViewList(){	$/;"	f	class:WcurveDoc
+checkMocCandidates	admin/am_edit	/^sub checkMocCandidates ()$/;"	s
+checkMocCandidates	admin/am_edit	/^sub checkMocCandidates ();$/;"	s
+clear_color	wcurve/plotview.cpp	/^QColor PlotView::clear_color = BLACK;$/;"	m	class:PlotView	file:
+clear_color	wcurve/plotview.h	/^  static QColor clear_color;$/;"	m	class:PlotView
+close	wcurve/plotview.h	/^  virtual bool close(){return QGLWidget::close();}$/;"	f	class:PlotView
+close	wcurve/sequenceview.h	/^  virtual bool close(){return QTextView::close();}$/;"	f	class:SequenceView
+closeDocument	wcurve/wcurvedoc.cpp	/^bool WcurveDoc::closeDocument()$/;"	f	class:WcurveDoc
+closeEvent	wcurve/wcurveview.cpp	/^void WcurveView::closeEvent(QCloseEvent*)$/;"	f	class:WcurveView
+convert	wcurve/wcurve.h	/^  	QString *convert;$/;"	m	class:WcurveApp
+convertNucleotide	wcurve/nogapparser.cpp	/^bool NoGapParser::convertNucleotide(Vector3D<float> *prevNuc,$/;"	f	class:NoGapParser
+convertNucleotide	wcurve/origingapparser.cpp	/^bool OriginGapParser::convertNucleotide(Vector3D<float> *prevNuc,$/;"	f	class:OriginGapParser
+convertNucleotide	wcurve/pentagapparser.cpp	/^bool PentaGapParser::convertNucleotide(Vector3D<float> *prevNuc, char nuc,$/;"	f	class:PentaGapParser
+convertNucleotide	wcurve/repeatgapparser.cpp	/^bool RepeatGapParser::convertNucleotide(Vector3D<float> *prevNuc,$/;"	f	class:RepeatGapParser
+createClient	wcurve/wcurve.cpp	/^void WcurveApp::createClient(WcurveDoc* doc, ViewID key)$/;"	f	class:WcurveApp
+createView	wcurve/wcurve.cpp	/^WcurveView* WcurveApp::createView(enum ViewID key, WcurveDoc *doc){$/;"	f	class:WcurveApp
+deleteContents	wcurve/wcurvedoc.cpp	/^void WcurveDoc::deleteContents()$/;"	f	class:WcurveDoc
+dld_link	admin/ltconfig	/^dld_link()$/;"	f
+dlopen	admin/ltconfig	/^dlopen()$/;"	f
+dlopen	admin/ltconfig	/^dlopen();$/;"	f
+doc	wcurve/wcurvelistviewitem.h	/^  WcurveDoc*    doc;$/;"	m	class:Wcurvelistviewitem
+doc	wcurve/wcurveview.h	/^  WcurveDoc *doc;$/;"	m	class:WcurveView
+endLabel	wcurve/wcurve.h	/^    QLabel *endLabel;$/;"	m	class:WcurveApp
+endList	wcurve/displaylist.cpp	/^void DisplayList::endList(){$/;"	f	class:DisplayList
+eventFilter	wcurve/wcurve.cpp	/^bool WcurveApp::eventFilter(QObject* object, QEvent* event)$/;"	f	class:WcurveApp
+extractFrustum	wcurve/displaylist.cpp	/^void DisplayList::extractFrustum(){$/;"	f	class:DisplayList
+fileClose	wcurve/wcurve.h	/^    QAction *fileClose;$/;"	m	class:WcurveApp
+fileOpen	wcurve/wcurve.h	/^    QAction *fileOpen;$/;"	m	class:WcurveApp
+filePrint	wcurve/wcurve.h	/^    QAction *filePrint;$/;"	m	class:WcurveApp
+fileQuit	wcurve/wcurve.h	/^    QAction *fileQuit;$/;"	m	class:WcurveApp
+fileSave	wcurve/wcurve.h	/^    QAction *fileSave;$/;"	m	class:WcurveApp
+fileSaveAs	wcurve/wcurve.h	/^    QAction *fileSaveAs;$/;"	m	class:WcurveApp
+fileToolbar	wcurve/wcurve.h	/^    QToolBar *fileToolbar;$/;"	m	class:WcurveApp
+findDoc	wcurve/wcurve.cpp	/^WcurveDoc * WcurveApp::findDoc(QString title){$/;"	f	class:WcurveApp
+findMocCandidates	admin/am_edit	/^sub findMocCandidates ()$/;"	s
+findMocCandidates	admin/am_edit	/^sub findMocCandidates ();$/;"	s
+firstVertex	wcurve/displaylist.cpp	/^void DisplayList::firstVertex(Vector3D<float> &vec){$/;"	f	class:DisplayList
+firstView	wcurve/wcurvedoc.h	/^		WcurveView* firstView(){ return pViewList->first(); };$/;"	f	class:WcurveDoc
+firstZ	wcurve/displaylist.h	/^  float firstZ;$/;"	m	class:DisplayList
+frustum	wcurve/displaylist.cpp	/^float DisplayList::frustum[6][4];$/;"	m	class:DisplayList	file:
+frustum	wcurve/displaylist.h	/^  static float frustum[6][4];$/;"	m	class:DisplayList
+gamma	wcurve/sequenceparser.h	/^	float gamma;$/;"	m	class:SequenceParser
+getDoc	wcurve/wcurvelistviewitem.cpp	/^WcurveDoc* Wcurvelistviewitem::getDoc(){$/;"	f	class:Wcurvelistviewitem
+getDocument	wcurve/wcurveview.cpp	/^WcurveDoc *WcurveView::getDocument() const {$/;"	f	class:WcurveView
+getGamma	wcurve/sequenceparser.cpp	/^float SequenceParser::getGamma(){$/;"	f	class:SequenceParser
+getGammaVal	wcurve/wcurvedoc.cpp	/^float WcurveDoc::getGammaVal(){$/;"	f	class:WcurveDoc
+getID	wcurve/wcurvelistviewitem.cpp	/^enum ParserID Wcurvelistviewitem::getID(){$/;"	f	class:Wcurvelistviewitem
+getKVal	wcurve/wcurvedoc.cpp	/^int WcurveDoc::getKVal(){$/;"	f	class:WcurveDoc
+getLastVec	wcurve/plotview.h	/^  Vector3D<float> getLastVec(){ return *last_vec;}$/;"	f	class:PlotView
+getModelData	wcurve/wcurvedoc.cpp	/^WcurveData WcurveDoc::getModelData(){$/;"	f	class:WcurveDoc
+getNucList	wcurve/wcurvedoc.cpp	/^vector<QChar> * WcurveDoc::getNucList(){$/;"	f	class:WcurveDoc
+getProjection	wcurve/plotview.cpp	/^int PlotView::getProjection(){$/;"	f	class:PlotView
+getView	wcurve/wcurvelistviewitem.cpp	/^WcurveView* Wcurvelistviewitem::getView(){$/;"	f	class:Wcurvelistviewitem
+getZIncrement	wcurve/sequenceparser.cpp	/^int SequenceParser::getZIncrement(){$/;"	f	class:SequenceParser
+glCam	wcurve/plotview.h	/^  Camera glCam;$/;"	m	class:PlotView
+handle_POFILES	admin/am_edit	/^sub handle_POFILES($$)$/;"	s
+handle_TOPLEVEL	admin/am_edit	/^sub handle_TOPLEVEL()$/;"	s
+height	wcurve/plotview.h	/^  int height;$/;"	m	class:PlotView
+helpAboutApp	wcurve/wcurve.h	/^    QAction *helpAboutApp;$/;"	m	class:WcurveApp
+helper_LOCALINSTALL	admin/am_edit	/^sub helper_LOCALINSTALL($)$/;"	s
+id	wcurve/displaylist.h	/^  GLuint id;$/;"	m	class:DisplayList
+id	wcurve/wcurvelistviewitem.h	/^  enum ParserID id;$/;"	m	class:Wcurvelistviewitem	typeref:enum:Wcurvelistviewitem::ParserID
+idString	wcurve/nogapparser.cpp	/^char* NoGapParser::idString(){$/;"	f	class:NoGapParser
+idString	wcurve/origingapparser.cpp	/^char* OriginGapParser::idString(){$/;"	f	class:OriginGapParser
+idString	wcurve/pentagapparser.cpp	/^char* PentaGapParser::idString(){$/;"	f	class:PentaGapParser
+idString	wcurve/repeatgapparser.cpp	/^char* RepeatGapParser::idString(){$/;"	f	class:RepeatGapParser
+initActions	wcurve/wcurve.cpp	/^void WcurveApp::initActions()$/;"	f	class:WcurveApp
+initMenuBar	wcurve/wcurve.cpp	/^void WcurveApp::initMenuBar()$/;"	f	class:WcurveApp
+initProjection	wcurve/plotview.cpp	/^void PlotView::initProjection(int w, int h){$/;"	f	class:PlotView
+initStatusBar	wcurve/wcurve.cpp	/^void WcurveApp::initStatusBar()$/;"	f	class:WcurveApp
+initToolBar	wcurve/wcurve.cpp	/^void WcurveApp::initToolBar()$/;"	f	class:WcurveApp
+initView	wcurve/wcurve.cpp	/^void WcurveApp::initView()$/;"	f	class:WcurveApp
+initialise	admin/am_edit	/^sub initialise ()$/;"	s
+initialise	admin/am_edit	/^sub initialise ();$/;"	s
+initializeGL	wcurve/plotview.cpp	/^void PlotView::initializeGL(){$/;"	f	class:PlotView
+insert_main_loop	admin/conf.change.pl	/^sub insert_main_loop {$/;"	s
+insert_main_loop_213	admin/conf.change.pl	/^sub insert_main_loop_213 {$/;"	s
+insert_main_loop_250	admin/conf.change.pl	/^sub insert_main_loop_250 {$/;"	s
+installEventFilter	wcurve/plotview.h	/^  virtual void installEventFilter ( const QObject * obj)$/;"	f	class:PlotView
+installEventFilter	wcurve/sequenceview.h	/^  virtual void installEventFilter ( const QObject * obj)$/;"	f	class:SequenceView
+isActiveWindow	wcurve/plotview.h	/^  virtual bool isActiveWindow(){return QGLWidget::isActiveWindow();}$/;"	f	class:PlotView
+isActiveWindow	wcurve/sequenceview.h	/^  virtual bool isActiveWindow(){return QTextView::isActiveWindow();}$/;"	f	class:SequenceView
+isLastView	wcurve/wcurvedoc.cpp	/^bool WcurveDoc::isLastView() {$/;"	f	class:WcurveDoc
+isLineWrapped	wcurve/plotview.cpp	/^bool PlotView::isLineWrapped(){$/;"	f	class:PlotView
+isModified	wcurve/wcurvedoc.h	/^    bool isModified(){ return modified; };$/;"	f	class:WcurveDoc
+kLabel	wcurve/wcurve.h	/^    QLabel* kLabel;$/;"	m	class:WcurveApp
+key	wcurve/wcurveview.h	/^  ViewID key(){return m_key;}$/;"	f	class:WcurveView
+keyReleaseEvent	wcurve/plotview.cpp	/^void PlotView::keyReleaseEvent(QKeyEvent* e){$/;"	f	class:PlotView
+last_vec	wcurve/plotview.h	/^  Vector3D<float> *last_vec;$/;"	m	class:PlotView
+lineWrap	wcurve/plotview.cpp	/^bool PlotView::lineWrap = false;$/;"	m	class:PlotView	file:
+lineWrap	wcurve/plotview.h	/^  static bool lineWrap;$/;"	m	class:PlotView
+lists	wcurve/plotview.h	/^  vector<DisplayList*> lists;$/;"	m	class:PlotView
+m_activeDoc	wcurve/wcurve.h	/^  WcurveDoc* m_activeDoc;$/;"	m	class:WcurveApp
+m_autoRotate	wcurve/wcurve.h	/^  bool m_autoRotate;$/;"	m	class:WcurveApp
+m_data	wcurve/wcurveview.h	/^  WcurveData m_data;$/;"	m	class:WcurveView
+m_endNuc	wcurve/wcurvedata.h	/^  int m_endNuc;$/;"	m	class:WcurveData
+m_filename	wcurve/wcurvedoc.h	/^    QString m_filename;$/;"	m	class:WcurveDoc
+m_filter	wcurve/wcurvedata.h	/^  bool m_filter[FILTER_SIZE];$/;"	m	class:WcurveData
+m_gamma	wcurve/wcurvedata.h	/^  float m_gamma;$/;"	m	class:WcurveData
+m_k	wcurve/wcurvedata.h	/^  int m_k;$/;"	m	class:WcurveData
+m_key	wcurve/wcurveview.h	/^  ViewID m_key;$/;"	m	class:WcurveView
+m_mod	wcurve/wcurvedata.h	/^  int m_mod;$/;"	m	class:WcurveData
+m_modelData	wcurve/wcurvedoc.h	/^    WcurveData m_modelData;$/;"	m	class:WcurveDoc
+m_realtime	wcurve/wcurve.h	/^  bool m_realtime;$/;"	m	class:WcurveApp
+m_startNuc	wcurve/wcurvedata.h	/^  int m_startNuc;$/;"	m	class:WcurveData
+m_title	wcurve/wcurvedoc.h	/^    QString m_title;$/;"	m	class:WcurveDoc
+m_z	wcurve/wcurvedata.h	/^  int m_z;$/;"	m	class:WcurveData
+main	admin/config.guess	/^		main()$/;"	f
+main	admin/config.guess	/^	main ()$/;"	f
+main	admin/config.guess	/^main ()$/;"	f
+main	wcurve/main.cpp	/^int main(int argc, char *argv[])$/;"	f
+make_closure	admin/config.pl	/^sub make_closure {$/;"	s
+make_meta_classes	admin/am_edit	/^sub make_meta_classes ()$/;"	s
+maxHeight	wcurve/plotview.h	/^  double maxHeight;$/;"	m	class:PlotView
+maxY	wcurve/plotview.h	/^  double maxY, minY;$/;"	m	class:PlotView
+minY	wcurve/plotview.h	/^  double maxY, minY;$/;"	m	class:PlotView
+modified	wcurve/wcurvedoc.h	/^    bool modified;$/;"	m	class:WcurveDoc
+mouseMoveEvent	wcurve/plotview.cpp	/^void PlotView::mouseMoveEvent(QMouseEvent* e){$/;"	f	class:PlotView
+mousePressEvent	wcurve/plotview.cpp	/^void PlotView::mousePressEvent(QMouseEvent *e){$/;"	f	class:PlotView
+mousePressed	wcurve/plotview.h	/^	bool mousePressed[3];$/;"	m	class:PlotView
+mouseReleaseEvent	wcurve/plotview.cpp	/^void PlotView::mouseReleaseEvent(QMouseEvent *e){	$/;"	f	class:PlotView
+mouseX	wcurve/plotview.h	/^  int mouseX; int mouseY; int mouseZ;$/;"	m	class:PlotView
+mouseY	wcurve/plotview.h	/^  int mouseX; int mouseY; int mouseZ;$/;"	m	class:PlotView
+mouseZ	wcurve/plotview.h	/^  int mouseX; int mouseY; int mouseZ;$/;"	m	class:PlotView
+newDocument	wcurve/wcurvedoc.cpp	/^bool WcurveDoc::newDocument()$/;"	f	class:WcurveDoc
+newList	wcurve/displaylist.cpp	/^void DisplayList::newList(){$/;"	f	class:DisplayList
+nodocs	admin/am_edit	/^  nodocs:$/;"	l
+notify	wcurve/wcurvedoc.cpp	/^void WcurveDoc::notify(){$/;"	f	class:WcurveDoc
+nucCount	wcurve/wcurvedoc.cpp	/^int WcurveDoc::nucCount(){$/;"	f	class:WcurveDoc
+nucList	wcurve/wcurvedoc.h	/^    vector<QChar> *nucList;$/;"	m	class:WcurveDoc
+nucParser	wcurve/plotview.h	/^  SequenceParser* nucParser;$/;"	m	class:PlotView
+numLists	wcurve/displaylist.cpp	/^long DisplayList::numLists(long num_verts){$/;"	f	class:DisplayList
+openDocument	wcurve/wcurvedoc.cpp	/^bool WcurveDoc::openDocument(const QString &filename, const char *format \/*=0*\/)$/;"	f	class:WcurveDoc
+openDocumentFile	wcurve/wcurve.cpp	/^void WcurveApp::openDocumentFile(const char* file)$/;"	f	class:WcurveApp
+operator *	wcurve/vector3d.cpp	/^template<class T> Vector3D<T> Vector3D<T>::operator*(T rhs){$/;"	f	class:Vector3D
+operator +	wcurve/vector3d.cpp	/^template<class T> Vector3D<T> Vector3D<T>::operator+(Vector3D<T> &rhs){$/;"	f	class:Vector3D
+operator -	wcurve/vector3d.cpp	/^template<class T> Vector3D<T> Vector3D<T>::operator-(Vector3D<T> &rhs){$/;"	f	class:Vector3D
+operator =	wcurve/vector3d.cpp	/^template<class T> void Vector3D<T>::operator=(Vector3D<T> &rhs){$/;"	f	class:Vector3D
+orient	wcurve/plotview.h	/^	GLfloat orient[3];$/;"	m	struct:Camera
+outputData	wcurve/wcurvedata.cpp	/^void WcurveData::outputData(QTextStream * outStream){$/;"	f	class:WcurveData
+pDocList	wcurve/wcurve.h	/^    QList<WcurveDoc> *pDocList;$/;"	m	class:WcurveApp
+pEndSlider	wcurve/wcurve.h	/^  	QSlider*  pEndSlider;$/;"	m	class:WcurveApp
+pFileMenu	wcurve/wcurve.h	/^    QPopupMenu *pFileMenu;$/;"	m	class:WcurveApp
+pFileView	wcurve/wcurve.h	/^  	QListView* pFileView;$/;"	m	class:WcurveApp
+pFilter	wcurve/wcurve.h	/^  	QCheckBox* pFilter[FILTER_SIZE];$/;"	m	class:WcurveApp
+pGammaSpinBox	wcurve/wcurve.h	/^    QSpinBox* pGammaSpinBox;$/;"	m	class:WcurveApp
+pHelpMenu	wcurve/wcurve.h	/^    QPopupMenu *pHelpMenu;$/;"	m	class:WcurveApp
+pKSlider	wcurve/wcurve.h	/^  	QSlider* pKSlider;$/;"	m	class:WcurveApp
+pModSpinBox	wcurve/wcurve.h	/^  	QSpinBox* pModSpinBox;$/;"	m	class:WcurveApp
+pStartSlider	wcurve/wcurve.h	/^  	QSlider*  pStartSlider;$/;"	m	class:WcurveApp
+pUpdateButton	wcurve/wcurve.h	/^  QButton* pUpdateButton;$/;"	m	class:WcurveApp
+pViewList	wcurve/wcurvedoc.h	/^    QList<WcurveView> *pViewList;	$/;"	m	class:WcurveDoc
+pViewMenu	wcurve/wcurve.h	/^    QPopupMenu *pViewMenu;$/;"	m	class:WcurveApp
+pWindowMenu	wcurve/wcurve.h	/^    QPopupMenu *pWindowMenu;$/;"	m	class:WcurveApp
+pWorkspace	wcurve/wcurve.h	/^    QWorkspace *pWorkspace;$/;"	m	class:WcurveApp
+pZSlider	wcurve/wcurve.h	/^    QSlider* pZSlider;$/;"	m	class:WcurveApp
+paintGL	wcurve/plotview.cpp	/^void PlotView::paintGL(){$/;"	f	class:PlotView
+parseFastaFile	wcurve/wcurvedoc.cpp	/^void WcurveDoc::parseFastaFile(const QString &filename){$/;"	f	class:WcurveDoc
+parseSeqFile	wcurve/wcurvedoc.cpp	/^void WcurveDoc::parseSeqFile(const QString &filename){$/;"	f	class:WcurveDoc
+parseWcvFile	wcurve/wcurvedoc.cpp	/^void WcurveDoc::parseWcvFile(const QString &filename){$/;"	f	class:WcurveDoc
+patch_file	admin/config.pl	/^sub patch_file {$/;"	s
+pathName	wcurve/wcurvedoc.cpp	/^const QString& WcurveDoc::pathName() const$/;"	f	class:WcurveDoc
+plotAxis	wcurve/plotview.cpp	/^void PlotView::plotAxis(){$/;"	f	class:PlotView
+pos	wcurve/plotview.h	/^  GLfloat pos[3];$/;"	m	struct:Camera
+print	wcurve/wcurveview.cpp	/^void WcurveView::print(QPrinter *pPrinter)$/;"	f	class:WcurveView
+print_contents	wcurve/plotview.h	/^  void print_contents(QPainter p){};$/;"	f	class:PlotView
+print_contents	wcurve/sequenceview.h	/^  void print_contents(QPainter p){};$/;"	f	class:SequenceView
+print_state	wcurve/plotview.h	/^  bool print_state;$/;"	m	class:PlotView
+printer	wcurve/wcurve.h	/^    QPrinter *printer;$/;"	m	class:WcurveApp
+processMakefile	admin/am_edit	/^sub processMakefile ($)$/;"	s
+processMakefile	admin/am_edit	/^sub processMakefile ($);$/;"	s
+projection	wcurve/plotview.cpp	/^int PlotView::projection = ORTHOGRAPHIC;$/;"	m	class:PlotView	file:
+projection	wcurve/plotview.h	/^  static int projection;$/;"	m	class:PlotView
+propagate	wcurve/wcurvedoc.cpp	/^void WcurveDoc::propagate(){$/;"	f	class:WcurveDoc
+pruneMocCandidates	admin/am_edit	/^sub pruneMocCandidates ($)$/;"	s
+pruneMocCandidates	admin/am_edit	/^sub pruneMocCandidates ($);$/;"	s
+queryExit	wcurve/wcurve.cpp	/^bool WcurveApp::queryExit()$/;"	f	class:WcurveApp
+radius	wcurve/displaylist.h	/^  float radius;$/;"	m	class:DisplayList
+radius	wcurve/plotview.h	/^  float radius;$/;"	m	class:PlotView
+refresh	wcurve/wcurveview.cpp	/^void WcurveView::refresh(){$/;"	f	class:WcurveView
+refreshAllViews	wcurve/wcurve.cpp	/^void WcurveApp::refreshAllViews(){$/;"	f	class:WcurveApp
+refreshAllViews	wcurve/wcurvedoc.cpp	/^void WcurveDoc::refreshAllViews()$/;"	f	class:WcurveDoc
+refreshView	wcurve/plotview.cpp	/^void PlotView::refreshView() {$/;"	f	class:PlotView
+refreshView	wcurve/sequenceview.h	/^  void refreshView(){};$/;"	f	class:SequenceView
+removeLine	admin/am_edit	/^sub removeLine ($$)$/;"	s
+removeLine	admin/am_edit	/^sub removeLine ($$);$/;"	s
+removeView	wcurve/wcurvedoc.cpp	/^void WcurveDoc::removeView(WcurveView *view)$/;"	f	class:WcurveDoc
+render	wcurve/displaylist.cpp	/^bool DisplayList::render(){$/;"	f	class:DisplayList
+renderList	wcurve/plotview.cpp	/^void PlotView::renderList()  {$/;"	f	class:PlotView
+renderNuc	wcurve/plotview.cpp	/^bool PlotView::renderNuc(int idx){$/;"	f	class:PlotView
+replaceDestDir	admin/am_edit	/^sub replaceDestDir($) {$/;"	s
+resizeGL	wcurve/plotview.cpp	/^void PlotView::resizeGL(int w, int h){$/;"	f	class:PlotView
+resolveViewType	wcurve/wcurve.cpp	/^WcurveView* WcurveApp::resolveViewType(QWidget *view){$/;"	f	class:WcurveApp
+restoreMakefile	admin/am_edit	/^sub restoreMakefile ()$/;"	s
+restoreMakefile	admin/am_edit	/^sub restoreMakefile ();$/;"	s
+rgb	wcurve/vector3d.h	/^	GLclampf rgb[3];$/;"	m	class:Vector3D
+rotateIncrement	wcurve/plotview.cpp	/^void PlotView::rotateIncrement()$/;"	f	class:PlotView
+saveDocument	wcurve/wcurvedoc.cpp	/^bool WcurveDoc::saveDocument(const QString &filename, WcurveView *v,$/;"	f	class:WcurveDoc
+setAutoRotate	wcurve/plotview.cpp	/^void PlotView::setAutoRotate(bool rotating){$/;"	f	class:PlotView
+setBackgroundColor	wcurve/plotview.cpp	/^void PlotView::setBackgroundColor(int color){$/;"	f	class:PlotView
+setCaption	wcurve/plotview.h	/^  virtual void setCaption(QString str){QGLWidget::setCaption(str);}$/;"	f	class:PlotView
+setCaption	wcurve/sequenceview.h	/^  virtual void setCaption(QString str){QTextView::setCaption(str);}$/;"	f	class:SequenceView
+setEndNuc	wcurve/wcurvedoc.cpp	/^bool WcurveDoc::setEndNuc(int end, bool propagate) {$/;"	f	class:WcurveDoc
+setFilter	wcurve/wcurvedoc.cpp	/^void WcurveDoc::setFilter(bool new_filter[FILTER_SIZE], bool propagate){$/;"	f	class:WcurveDoc
+setFocus	wcurve/plotview.h	/^  virtual void setFocus(){QGLWidget::setFocus();}$/;"	f	class:PlotView
+setFocus	wcurve/sequenceview.h	/^  virtual void setFocus(){QTextView::setFocus();}$/;"	f	class:SequenceView
+setGamma	wcurve/nogapparser.cpp	/^void NoGapParser::setGamma(float newG){$/;"	f	class:NoGapParser
+setGamma	wcurve/origingapparser.cpp	/^void OriginGapParser::setGamma(float newG){$/;"	f	class:OriginGapParser
+setGamma	wcurve/pentagapparser.cpp	/^void PentaGapParser::setGamma(float newG){$/;"	f	class:PentaGapParser
+setGamma	wcurve/repeatgapparser.cpp	/^void RepeatGapParser::setGamma(float newG){$/;"	f	class:RepeatGapParser
+setGamma	wcurve/sequenceparser.cpp	/^void SequenceParser::setGamma(float newG){$/;"	f	class:SequenceParser
+setGammaVal	wcurve/wcurvedoc.cpp	/^void WcurveDoc::setGammaVal(int newG, bool propagate){$/;"	f	class:WcurveDoc
+setGeometry	wcurve/plotview.h	/^  virtual void setGeometry( const QRect &rect)$/;"	f	class:PlotView
+setGeometry	wcurve/sequenceview.h	/^  virtual void setGeometry( const QRect &rect)$/;"	f	class:SequenceView
+setKVal	wcurve/wcurvedoc.cpp	/^bool WcurveDoc::setKVal(int newKVal, bool propagate){$/;"	f	class:WcurveDoc
+setLineWrap	wcurve/plotview.cpp	/^void PlotView::setLineWrap(bool state){$/;"	f	class:PlotView
+setListViewSelection	wcurve/wcurve.cpp	/^void WcurveApp::setListViewSelection(QString parent_text, QString child_text){$/;"	f	class:WcurveApp
+setModVal	wcurve/wcurvedoc.cpp	/^bool WcurveDoc::setModVal(int newModVal, bool propagate){$/;"	f	class:WcurveDoc
+setModified	wcurve/wcurvedoc.h	/^    void setModified(bool _m=true){ modified=_m; };$/;"	f	class:WcurveDoc
+setPathName	wcurve/wcurvedoc.cpp	/^void WcurveDoc::setPathName(const QString &name)$/;"	f	class:WcurveDoc
+setProjection	wcurve/plotview.cpp	/^void PlotView::setProjection(int proj){$/;"	f	class:PlotView
+setStartNuc	wcurve/wcurvedoc.cpp	/^bool WcurveDoc::setStartNuc(int start, bool propagate){$/;"	f	class:WcurveDoc
+setTitle	wcurve/wcurvedoc.cpp	/^void WcurveDoc::setTitle(const QString &title)$/;"	f	class:WcurveDoc
+setVertexSpacing	wcurve/displaylist.cpp	/^void DisplayList::setVertexSpacing(double spacing){$/;"	f	class:DisplayList
+setView	wcurve/wcurvelistviewitem.cpp	/^void Wcurvelistviewitem::setView(WcurveView* pView){$/;"	f	class:Wcurvelistviewitem
+setZIncrement	wcurve/sequenceparser.cpp	/^void SequenceParser::setZIncrement(int newZ){$/;"	f	class:SequenceParser
+setZVal	wcurve/wcurvedoc.cpp	/^void WcurveDoc::setZVal(int newZ, bool propagate){$/;"	f	class:WcurveDoc
+shl_load	admin/ltconfig	/^shl_load()$/;"	f
+shl_load	admin/ltconfig	/^shl_load();$/;"	f
+show	wcurve/plotview.h	/^  virtual void show(){QGLWidget::show();}$/;"	f	class:PlotView
+show	wcurve/sequenceview.h	/^  virtual void show(){QTextView::show();}$/;"	f	class:SequenceView
+showMaximized	wcurve/plotview.h	/^  virtual void showMaximized(){QGLWidget::showMaximized();}$/;"	f	class:PlotView
+showMaximized	wcurve/sequenceview.h	/^  virtual void showMaximized(){QTextView::showMaximized();}$/;"	f	class:SequenceView
+slotEndNucChanged	wcurve/wcurve.cpp	/^void WcurveApp::slotEndNucChanged(int newVal){$/;"	f	class:WcurveApp
+slotFileClose	wcurve/wcurve.cpp	/^void WcurveApp::slotFileClose()$/;"	f	class:WcurveApp
+slotFileOpen	wcurve/wcurve.cpp	/^void WcurveApp::slotFileOpen()$/;"	f	class:WcurveApp
+slotFilePrint	wcurve/wcurve.cpp	/^void WcurveApp::slotFilePrint()$/;"	f	class:WcurveApp
+slotFileQuit	wcurve/wcurve.cpp	/^void WcurveApp::slotFileQuit()$/;"	f	class:WcurveApp
+slotFileSave	wcurve/wcurve.cpp	/^void WcurveApp::slotFileSave()$/;"	f	class:WcurveApp
+slotFileSaveAs	wcurve/wcurve.cpp	/^void WcurveApp::slotFileSaveAs()$/;"	f	class:WcurveApp
+slotFilterModified	wcurve/wcurve.cpp	/^void WcurveApp::slotFilterModified(){$/;"	f	class:WcurveApp
+slotGammaChanged	wcurve/wcurve.cpp	/^void WcurveApp::slotGammaChanged(int newVal){$/;"	f	class:WcurveApp
+slotHelpAbout	wcurve/wcurve.cpp	/^void WcurveApp::slotHelpAbout()$/;"	f	class:WcurveApp
+slotKValChanged	wcurve/wcurve.cpp	/^void WcurveApp::slotKValChanged(int newVal){$/;"	f	class:WcurveApp
+slotModChanged	wcurve/wcurve.cpp	/^void WcurveApp::slotModChanged(int newVal){$/;"	f	class:WcurveApp
+slotStartNucChanged	wcurve/wcurve.cpp	/^void WcurveApp::slotStartNucChanged(int newVal){$/;"	f	class:WcurveApp
+slotStatusHelpMsg	wcurve/wcurve.cpp	/^void WcurveApp::slotStatusHelpMsg(const QString &text)$/;"	f	class:WcurveApp
+slotUpdateButtonClicked	wcurve/wcurve.cpp	/^void WcurveApp::slotUpdateButtonClicked(){$/;"	f	class:WcurveApp
+slotUpdateControls	wcurve/wcurve.cpp	/^void WcurveApp::slotUpdateControls(QWidget *w){$/;"	f	class:WcurveApp
+slotViewAutoRotate	wcurve/wcurve.cpp	/^void WcurveApp::slotViewAutoRotate(bool toggled){$/;"	f	class:WcurveApp
+slotViewBlack	wcurve/wcurve.cpp	/^void WcurveApp::slotViewBlack(bool toggled){$/;"	f	class:WcurveApp
+slotViewLineWrap	wcurve/wcurve.cpp	/^void WcurveApp::slotViewLineWrap(bool toggle){$/;"	f	class:WcurveApp
+slotViewListSelection	wcurve/wcurve.cpp	/^void WcurveApp::slotViewListSelection(QListViewItem* item){$/;"	f	class:WcurveApp
+slotViewOrthogonal	wcurve/wcurve.cpp	/^void WcurveApp::slotViewOrthogonal(bool toggled){$/;"	f	class:WcurveApp
+slotViewPerspective	wcurve/wcurve.cpp	/^void WcurveApp::slotViewPerspective(bool toggled){$/;"	f	class:WcurveApp
+slotViewRealTime	wcurve/wcurve.cpp	/^void WcurveApp::slotViewRealTime(bool toggled){$/;"	f	class:WcurveApp
+slotViewStatusBar	wcurve/wcurve.cpp	/^void WcurveApp::slotViewStatusBar(bool toggle)$/;"	f	class:WcurveApp
+slotViewToolBar	wcurve/wcurve.cpp	/^void WcurveApp::slotViewToolBar(bool toggle)$/;"	f	class:WcurveApp
+slotViewWhite	wcurve/wcurve.cpp	/^void WcurveApp::slotViewWhite(bool toggled){$/;"	f	class:WcurveApp
+slotZValChanged	wcurve/wcurve.cpp	/^void WcurveApp::slotZValChanged(int val){$/;"	f	class:WcurveApp
+sphereInFrustum	wcurve/displaylist.cpp	/^bool DisplayList::sphereInFrustum(){$/;"	f	class:DisplayList
+startLabel	wcurve/wcurve.h	/^    QLabel *startLabel;$/;"	m	class:WcurveApp
+substituteLine	admin/am_edit	/^sub substituteLine ($$)$/;"	s
+substituteLine	admin/am_edit	/^sub substituteLine ($$);$/;"	s
+tag_AUTOMAKE	admin/am_edit	/^sub tag_AUTOMAKE ()$/;"	s
+tag_AUTOMAKE	admin/am_edit	/^sub tag_AUTOMAKE ();$/;"	s
+tag_CLOSURE	admin/am_edit	/^sub tag_CLOSURE () {$/;"	s
+tag_CLOSURE	admin/am_edit	/^sub tag_CLOSURE();$/;"	s
+tag_COMPILE_FIRST	admin/am_edit	/^sub tag_COMPILE_FIRST()$/;"	s
+tag_DIST	admin/am_edit	/^sub tag_DIST () {$/;"	s
+tag_DIST	admin/am_edit	/^sub tag_DIST();$/;"	s
+tag_DOCFILES	admin/am_edit	/^sub tag_DOCFILES ()$/;"	s
+tag_DOCFILES	admin/am_edit	/^sub tag_DOCFILES ();$/;"	s
+tag_FINAL	admin/am_edit	/^sub tag_FINAL()$/;"	s
+tag_ICON	admin/am_edit	/^sub tag_ICON()$/;"	s
+tag_ICON	admin/am_edit	/^sub tag_ICON();$/;"	s
+tag_IDLFILES	admin/am_edit	/^sub tag_IDLFILES ()$/;"	s
+tag_IDLFILES	admin/am_edit	/^sub tag_IDLFILES();$/;"	s
+tag_LOCALINSTALL	admin/am_edit	/^sub tag_LOCALINSTALL ()$/;"	s
+tag_LOCALINSTALL	admin/am_edit	/^sub tag_LOCALINSTALL();$/;"	s
+tag_METASOURCES	admin/am_edit	/^sub tag_METASOURCES ()$/;"	s
+tag_METASOURCES	admin/am_edit	/^sub tag_METASOURCES ();$/;"	s
+tag_META_INCLUDES	admin/am_edit	/^sub tag_META_INCLUDES ()$/;"	s
+tag_META_INCLUDES	admin/am_edit	/^sub tag_META_INCLUDES ();$/;"	s
+tag_POFILES	admin/am_edit	/^sub tag_POFILES ()$/;"	s
+tag_POFILES	admin/am_edit	/^sub tag_POFILES ();$/;"	s
+tag_SUBDIRS	admin/am_edit	/^sub tag_SUBDIRS ()$/;"	s
+tag_SUBDIRS	admin/am_edit	/^sub tag_SUBDIRS();$/;"	s
+tag_UIFILES	admin/am_edit	/^sub tag_UIFILES ()$/;"	s
+tag_UIFILES	admin/am_edit	/^sub tag_UIFILES();$/;"	s
+timerEvent	wcurve/wcurve.cpp	/^void WcurveApp::timerEvent(QTimerEvent *){$/;"	f	class:WcurveApp
+title	wcurve/wcurvedoc.cpp	/^const QString &WcurveDoc::title() const$/;"	f	class:WcurveDoc
+untitledCount	wcurve/wcurve.h	/^    int untitledCount;$/;"	m	class:WcurveApp
+update	wcurve/wcurveview.cpp	/^void WcurveView::update(){$/;"	f	class:WcurveView
+update	wcurve/wcurveview.cpp	/^void WcurveView::update(WcurveView* pSender){$/;"	f	class:WcurveView
+updateAllViews	wcurve/wcurve.cpp	/^void WcurveApp::updateAllViews(){$/;"	f	class:WcurveApp
+updateAllViews	wcurve/wcurvedoc.cpp	/^void WcurveDoc::updateAllViews(WcurveView *sender)$/;"	f	class:WcurveDoc
+updateMakefile	admin/am_edit	/^sub updateMakefile ()$/;"	s
+updateMakefile	admin/am_edit	/^sub updateMakefile ();$/;"	s
+updateShow	wcurve/wcurve.h	/^    QAction *updateShow;$/;"	m	class:WcurveApp
+updateView	wcurve/plotview.cpp	/^void PlotView::updateView() {$/;"	f	class:PlotView
+updateView	wcurve/sequenceview.h	/^  void updateView(){};$/;"	f	class:SequenceView
+vertex_count	wcurve/displaylist.h	/^  long vertex_count;$/;"	m	class:DisplayList
+vertex_spacing	wcurve/displaylist.h	/^  double vertex_spacing;$/;"	m	class:DisplayList
+view	wcurve/wcurvedoc.cpp	/^WcurveView* WcurveDoc::view(int key){$/;"	f	class:WcurveDoc
+view	wcurve/wcurvelistviewitem.h	/^  WcurveView*   view;$/;"	m	class:Wcurvelistviewitem
+viewAutoRotate	wcurve/wcurve.h	/^    QAction *viewAutoRotate;$/;"	m	class:WcurveApp
+viewBlack	wcurve/wcurve.h	/^    QAction *viewBlack;$/;"	m	class:WcurveApp
+viewKey	wcurve/wcurve.cpp	/^ViewID WcurveApp::viewKey(QString type){$/;"	f	class:WcurveApp
+viewKeyString	wcurve/wcurve.cpp	/^QString WcurveApp::viewKeyString(ViewID key){$/;"	f	class:WcurveApp
+viewLineWrap	wcurve/wcurve.h	/^    QAction *viewLineWrap;$/;"	m	class:WcurveApp
+viewOrthogonal	wcurve/wcurve.h	/^    QAction *viewOrthogonal;$/;"	m	class:WcurveApp
+viewPerspective	wcurve/wcurve.h	/^    QAction *viewPerspective;$/;"	m	class:WcurveApp
+viewRealTime	wcurve/wcurve.h	/^    QAction *viewRealTime;$/;"	m	class:WcurveApp
+viewStatusBar	wcurve/wcurve.h	/^    QAction *viewStatusBar;$/;"	m	class:WcurveApp
+viewToolBar	wcurve/wcurve.h	/^    QAction *viewToolBar;$/;"	m	class:WcurveApp
+viewWhite	wcurve/wcurve.h	/^    QAction *viewWhite;$/;"	m	class:WcurveApp
+wheelEvent	wcurve/plotview.cpp	/^void PlotView::wheelEvent(QWheelEvent *e){$/;"	f	class:PlotView
+width	wcurve/plotview.h	/^  int width;$/;"	m	class:PlotView
+windowAction	wcurve/wcurve.h	/^    QActionGroup *windowAction;$/;"	m	class:WcurveApp
+windowCascade	wcurve/wcurve.h	/^    QAction *windowCascade;$/;"	m	class:WcurveApp
+windowMenuAboutToShow	wcurve/wcurve.cpp	/^void WcurveApp::windowMenuAboutToShow()$/;"	f	class:WcurveApp
+windowMenuActivated	wcurve/wcurve.cpp	/^void WcurveApp::windowMenuActivated( int id )$/;"	f	class:WcurveApp
+windowTile	wcurve/wcurve.h	/^    QAction *windowTile;$/;"	m	class:WcurveApp
+zLabel	wcurve/wcurve.h	/^		QLabel* zLabel;$/;"	m	class:WcurveApp
+z_cal	wcurve/sequenceparser.h	/^  double z_cal;$/;"	m	class:SequenceParser
+z_increment	wcurve/sequenceparser.h	/^  int z_increment;$/;"	m	class:SequenceParser
+~DisplayList	wcurve/displaylist.cpp	/^DisplayList::~DisplayList(){$/;"	f	class:DisplayList
+~NoGapParser	wcurve/nogapparser.cpp	/^NoGapParser::~NoGapParser(){$/;"	f	class:NoGapParser
+~OriginGapParser	wcurve/origingapparser.cpp	/^OriginGapParser::~OriginGapParser(){$/;"	f	class:OriginGapParser
+~PentaGapParser	wcurve/pentagapparser.cpp	/^PentaGapParser::~PentaGapParser(){$/;"	f	class:PentaGapParser
+~PlotView	wcurve/plotview.cpp	/^PlotView::~PlotView(){$/;"	f	class:PlotView
+~RepeatGapParser	wcurve/repeatgapparser.cpp	/^RepeatGapParser::~RepeatGapParser(){$/;"	f	class:RepeatGapParser
+~SequenceParser	wcurve/sequenceparser.cpp	/^SequenceParser::~SequenceParser(){$/;"	f	class:SequenceParser
+~SequenceView	wcurve/sequenceview.cpp	/^SequenceView::~SequenceView(){$/;"	f	class:SequenceView
+~Vector3D	wcurve/vector3d.cpp	/^template<class T> Vector3D<T>::~Vector3D(){$/;"	f	class:Vector3D
+~WcurveApp	wcurve/wcurve.cpp	/^WcurveApp::~WcurveApp()$/;"	f	class:WcurveApp
+~WcurveData	wcurve/wcurvedata.cpp	/^WcurveData::~WcurveData(){$/;"	f	class:WcurveData
+~WcurveDoc	wcurve/wcurvedoc.cpp	/^WcurveDoc::~WcurveDoc()$/;"	f	class:WcurveDoc
+~WcurveView	wcurve/wcurveview.cpp	/^WcurveView::~WcurveView(){$/;"	f	class:WcurveView
+~Wcurvelistviewitem	wcurve/wcurvelistviewitem.cpp	/^Wcurvelistviewitem::~Wcurvelistviewitem(){$/;"	f	class:Wcurvelistviewitem
