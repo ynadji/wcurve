@@ -1,1 +1,7 @@
+The Wcurve is a new algorithm geared towards sequencing genomes. It sequences in a revoluationary way by generating a 3d visualization of the genome in linear time.
 
+Install Dependencies:
+
+	- libcgal2, libcgal-dev
+	- automake1.9
+	- libqt4-{dev,core,debug}
