@@ -6,6 +6,9 @@ Install Dependencies:
 	- automake1.9
 	- libqt4-{dev,core,debug}
 	- g++
+	- libqt3-compat-headers
 	
 == Notes ==
 - Seems as though it doesn't work with qt4. Weird. I have a feeling it's a strange issue with the configure script not realizing qt4 is an acceptable version. Look into it.
+
+- Adding -lCGAL needs to be done to the last g++ call. You can see it above the error after you run `make`. Just copy/paste and add -lCGAL.
