@@ -5,3 +5,7 @@ Install Dependencies:
 	- libcgal2, libcgal-dev
 	- automake1.9
 	- libqt4-{dev,core,debug}
+	- g++
+	
+== Notes ==
+- Seems as though it doesn't work with qt4. Weird. I have a feeling it's a strange issue with the configure script not realizing qt4 is an acceptable version. Look into it.
