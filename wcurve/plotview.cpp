@@ -17,6 +17,7 @@
 
 #include "plotview.h"
 #include "wcurvedoc.h"
+#include "displaylist.h"
 
 int PlotView::projection = ORTHOGRAPHIC;
 bool PlotView::lineWrap = false;

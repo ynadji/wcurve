@@ -38,7 +38,7 @@ public:
   /** sets the distance in between vertices, used to calculate the radius */
   void setVertexSpacing(double spacing);
   /** adds the vector to the displaylist, returns false when the display list is full, true otherwise */
-  inline bool addVertex(Vector3D<float> &vec);
+  bool addVertex(Vector3D<float> &vec);
   /** adds the vector to the displaylist, and records its Z coordinate for sphere calculations */
   void firstVertex(Vector3D<float> &vec);
   /** Calculates the mathematical boundary of the viewing volume that is used
