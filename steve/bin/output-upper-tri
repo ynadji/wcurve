@@ -1,0 +1,51 @@
+#!/opt/bin/perl
+
+use strict;
+use feature     qw( :5.10 );
+
+use Fatal       qw( open );
+
+my $outfile = shift or die "Missing output file";
+
+open my $out, '>', $outfile;
+
+select $out;
+$| = 1;
+
+# remainder of args are globs for input file, usually
+# a directory.
+
+@ARGV or die "Missing inputs";
+
+my @pathz   = grep { $_ } map { glob $_ . '*' } @ARGV;
+
+print scalar @pathz, "\n";
+
+# output files from the first pass are organized
+# as:  <base sequence id>\n<other sequence>\t<score>\n...
+#
+# output has to be 10-char, space-padded identifier
+# of base followed by scores. This leaves each file
+# having its first entry (base) printed followed by
+# all of the scores.
+
+my $i   = 0;
+
+for ( @pathz )
+{
+    open my $fh, '<', $_;
+
+    chomp( my $ident = <$fh> ); 
+
+    printf "%-10s", $ident;
+
+    while( <$fh> )
+    {
+        print "\t", ( split )[1];
+    }
+
+    print "\n";
+}
+
+__END__
+

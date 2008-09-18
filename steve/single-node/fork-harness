@@ -1,0 +1,604 @@
+#!/opt/bin/perl -w
+
+package Harness;
+
+########################################################################
+# compute a list of genes that get w-curved.
+#
+# given an NCBI file, read the chromosome and gene list, then extract
+# the chromosomes with 35bp preceeding the gene.
+########################################################################
+
+########################################################################
+# housekeeping
+########################################################################
+
+use strict;
+use warnings;
+
+use FindBin::libs;
+
+use Carp;
+
+use Getopt::Long;
+
+use Data::Dumper;
+    $Data::Dumper::Purity           = 1;
+    $Data::Dumper::Terse            = 1;
+    $Data::Dumper::Indent           = 1;
+    $Data::Dumper::Deepcopy         = 0;
+    $Data::Dumper::Quotekeys        = 0;
+
+use Schedule::Parallel;
+
+select STDERR;
+
+########################################################################
+# command line & package variables
+# anything left on the command line are the genbank files.
+########################################################################
+
+my @optionz = 
+qw(
+    order=s
+    sort=s
+    maxlen=i
+    maxerr=f
+
+    maxproc=i
+
+    nozero!
+
+    verbose+
+    debug+
+
+    test!
+    nofork!
+
+    keepall!
+    help!
+);
+
+my $cmdline = {};
+
+unless( GetOptions $cmdline, @optionz )
+{
+    print "\nUsage:\n\t$0 [--verbose][--debug] classname file1.gb file2.gb ...\n";
+
+    exit -1;
+}
+
+# control logging messages, automatic breakpoints.
+
+my $verbose = $cmdline->{verbose} || 0;
+my $debug   = $cmdline->{debug} || 0;
+
+my $keepall = $cmdline->{keepall} || 0;
+
+my $maxlen = ( $cmdline->{maxlen} || 15 ) / 100;
+my $maxerr = $cmdline->{maxerr} || 0.30;
+
+my $numproc = $cmdline->{nofork} ? 0 : $cmdline->{maxproc} || 1;
+
+my $purgezero = $cmdline->{nozero} || 0;
+
+print "\nParallel processes: $numproc\n";
+
+my $class = shift or die "Command line missing curve class";
+
+# load the cuve class, check for generate and comapre hooks.
+
+eval "require $class" or die "Failed loading class '$class'";
+
+if( my $sub = $class->can('import') )
+{
+    # resolves to an empty list of order was not given,
+    # which then uses the default order.
+    
+    $sub->( split //, ($cmdline->{order} ||= '') );
+}
+
+my $curve_gen = $class->can( 'generate' )
+    or die "Bogus class: $class cannot 'generate'.";
+
+my $curve_cmp = $class->can( 'compare' )
+    or die "Bogus class: $class cannot 'compare'.";
+
+$cmdline->{sort} ||= 'name';
+
+my $tablesort = __PACKAGE__->can( $cmdline->{sort} )
+    or die "Bogus sorter: $cmdline->{sort}";
+
+# temporary file template.
+
+my $template = join '_', $$,' XXXX';
+
+# deal with forks a bit more gracefully.
+
+$DB::fork_TTY = $ENV{FORK_TTY} if $^P && $ENV{FORK_TTY};
+# base and alt gene storage.
+
+my $genepool = [];
+
+my @length_que = ();
+
+my $start = 0;
+my $comparetime = 0;
+
+########################################################################
+# shared code
+########################################################################
+
+########################################################################
+# output sorts
+########################################################################
+
+sub name
+{
+    $a->[0] cmp $b->[0]
+}
+
+sub score
+{
+    $a->[-1] <=> $b->[-1]
+    or
+    $a->[0] cmp $b->[0]
+}
+
+sub read_genbank
+{
+    local $| = 1;
+
+    use Bio::SeqIO;
+
+    my $path = shift
+        or croak "Bogus read_genbank: missing path";
+
+    my $no_dna = shift || 0;
+
+    -e $path or croak "Bogus read_genbank: nonexistant '$path'";
+    -r _     or croak "Bogus read_genbank: unreadable '$path'";
+    -s _     or croak "Bogus read_genbank: empty '$path'";
+
+    #i trick here is to read the file and map out the features.
+    # whether or not this is a whole-genome file, the genes
+    # come back as a list which can be handled via map.
+    #
+    # for whatever reason, next-seq returns only a single 
+    # item for whole-genome files.
+
+    my $fh = Bio::SeqIO->new( -file => $path, -format => 'GenBank' )
+        or die "Roadkill: unable to open B::SeqIO: $!";
+
+    my $seq = ( $fh->next_seq )[ 0 ];
+
+    # strip things like 'Mycobacterium bovis subsp. bovis AF2122/97'
+    # down to 'Mycobacterium bovis'.
+
+    my ( $species ) = $seq->{species}->common_name =~ m{^(\S+\s+\S+)};
+
+    print "\nReading: $species\n";
+        
+    if( $verbose > 1 )
+    {
+        print "Writing $species.dump\n";
+
+        open my $fh, '>', "$species.dump" or die "$species: $!";
+
+        print $fh Dumper($seq), "\n";
+    }
+    
+    # $genz gets stored in the genepool by species key.
+    # it will contain arrays of gene names (dispatcher)
+    # or combined gene name and DNA string (compute).
+    #
+    # for a given min & max length,
+    #
+    #   @{$genz}{$min..$max}
+    #
+    # are the genes that seem worth comparing based on 
+    # their length. the dispatcher only needs gene names,
+    # the compute nodes need a name along with the dna. 
+
+    my $genz = {};
+
+    my $gene_count = 0;
+
+    for( $seq->get_SeqFeatures )
+    {
+        next unless $_->primary_tag eq 'CDS' && $_->has_tag('gene');
+
+        my $g = ( $_->get_tag_values('gene') )[0];
+        my $s = $_->spliced_seq->{seq};
+        my $l = $no_dna ? 
+            length $_->spliced_seq->{seq} :
+            length (my $dna = $_->spliced_seq->{seq} )
+        ;
+
+        $genz->{$l}{$g} = $no_dna ? '' : $dna; 
+
+        ++$gene_count;
+    }
+
+    # caller gets back the species name and gene hash.
+
+    [ $species, $genz, $gene_count ]
+}
+
+# given arrays of base and alt species genes, compare them
+# using the provided class' generate and compare hooks.
+# for each base gene, pick the two best (lowest) stores and
+# dump the second one if it is more than 50% larger than the
+# best one.
+#
+# caller gets nothing returned back: all of the updates are
+# in the output hash.
+
+sub compare_genes
+{
+    my $length = shift
+        or croak "Bogus compare_genes: missing length que entry";
+
+    print "\nLength: $length->[0] ($length->[1] .. $length->[2])\n";
+
+    my @matched = ();
+
+    if
+    (
+        my @alt  =
+            grep { defined }
+            @{ $genepool->[1][1] }{$length->[1] .. $length->[2]}
+    )
+    {
+
+        my $base = @{ $genepool->[0][1] }{ $length->[0] }
+            or croak "Bogus compare_genes: no base genes for length $length";
+
+        print
+            join( ' ', 'Base: ', keys %$base ),
+            "\n",
+            join( ' ', 'Alt:  ', map { keys %$_ } @alt ),
+            "\n"
+        ;
+
+        while( my($base_gene, $base_dna) = each %$base )
+        {
+            # prep the cache with the first piece of 
+            # base-species dna.
+
+            my $cache = [];
+
+            $curve_gen->( $base_dna, 0, $cache );
+
+            my $best_gene = '';
+            my $best_score = $maxerr;
+
+            for( @alt )
+            {
+                while( my($alt_gene, $alt_dna) = each %$_ )
+                {
+                    # no real value in comparing a gene
+                    # to itself.
+
+                    next if $alt_gene eq $base_gene;
+
+                    # fold in the alternate species' dna and 
+                    # run the comparison. undef signifies that
+                    # the curve generation aborted due to local
+                    # values exceeding the cutoff.
+
+                    $curve_gen->( $alt_dna, 1, $cache );
+
+                    next unless
+                        defined( my $i = $curve_cmp->($cache) );
+                    
+                    if( $keepall )
+                    {
+                        push @matched, [ $base_gene, $alt_gene, $i ]
+                        if $i < $maxerr;
+                    }
+                    elsif( $i < $best_score )
+                    {
+                        $best_gene = $alt_gene;
+                        $best_score = $i;
+                    }
+                }
+
+            }
+
+            push @matched, [ $base_gene, $best_gene, $best_score ]
+                unless $keepall || $best_score >= $maxerr;
+        }
+    }
+    else
+    {
+        print "No alternate genes for @$length";
+    }
+
+    # caller gets back the matched genes.
+
+    \@matched
+}
+
+########################################################################
+# convert the results array into an html table.
+
+sub format_output
+{
+    my $base_species = shift
+        or croak "Bogus format_output: missing base_species";
+
+    my $alt_species = shift
+        or croak "Bogus format_output: missing alt_species";
+
+    my $result = shift
+        or croak "Bogus format_output: missing result";
+
+    my $curveid =
+        $class->can( 'idstring' ) ? $class->idstring : $class;
+
+    my $path =
+        join '-', $base_species, $alt_species, $maxerr, $curveid, $cmdline->{sort};
+    
+    $path =~ s/\s+/_/g;
+
+    $path .= '.html';
+
+    open my $fh, '>', $path or die "$path: $!";
+
+    # total number of genes found may not equal the 
+    # number of table rows if multiple rows are 
+    # displayed for a given gene...
+
+    my $rowcount = @$result;
+
+    my %matched = map { $_->[0], 1 } @$result;
+
+    my $matched = scalar keys %matched;
+
+    my $compcount = 0;
+    my $basecount = 0;
+    my $altcount  = 0;
+
+    for my $length ( @length_que )
+    {
+        my $i = 0;
+        my $j = 0;
+
+        $i += keys %$_
+            for @{$genepool->[0][1]}{ $length->[0] };
+
+        $j += keys %$_
+            for @{$genepool->[1][1]}{ $length->[1]..$length->[2] };
+
+        $basecount += $i;
+        $altcount  += $j;
+        $compcount += $i * $j;
+    }
+
+    my $totalcount = $genepool->[0][2] * $genepool->[1][2];
+
+    my $curvetitle =
+        $class->can( 'heading' ) ? $class->heading : $class;
+
+    my $basepct = ( int 10000 * @$result/$basecount ) / 100;
+    my $genepct = ( int 10000 * $matched/$basecount   ) / 100;
+
+    my $comppct = ( int 10000 * $compcount/$totalcount ) / 100;
+    my $altpct  = ( int 10000 * $altcount /$totalcount ) / 100;
+
+    my $runtime  = time - $start;
+    my $comprate = int( $compcount / $comparetime);
+    my $timepct  = int( 100 * $comparetime / $runtime);
+
+    select $fh;
+
+    # note: there's a reason to keep the header portion
+    # indented: /^<tr>/ finds the data rows for post-
+    # processing.
+
+    print <<"HTML";
+<html>
+<head>
+    <title>
+    Whole-genome comparison of $base_species to $alt_species
+    </title>
+</head>
+<body>
+
+    <table border id="${base_species}_${alt_species}">
+
+    <tr><th>Whole Gnome Comparison:<i>$base_species</i>, <i>$alt_species</i>
+
+    <td><tr>
+    <table border id="${base_species}_${alt_species}_summary">
+
+        <tr><th align=left colspan=3 > Curve Description:
+        <tr><th align=left > Curve Used:     <td colspan=2 align=left >$curvetitle
+        <tr><th align=left > Score Cutoff:   <td colspan=2 align=left >$maxerr
+        <tr><th align=left > Length Cutoff:  <td colspan=2 align=left >$maxlen%
+
+        <tr><th align=left colspan=3 > Report Size:
+        <tr><th align=left > Base Genes:           <th align=right >$basecount <td align=right > &nbsp;
+        <tr><th align=left > Matched Base genes:   <th align=right >$matched   <td align=right > $genepct% 
+        <tr><th align=left > Report Rows:          <th align=right >$rowcount  <td align=right > $basepct% 
+
+        <tr><th align=left colspan=3 > Filter Effeciency:
+        <tr><th align=left > Cartesian Product:    <th align=right >$totalcount <td align=right > &nbsp;
+        <tr><th align=left > Alt. Genes Compared:  <th align=right >$altcount   <td align=right > $altpct%
+        <tr><th align=left > Total Comparisons:    <th align=right >$compcount  <td align=right > $comppct%
+
+        <tr><th align=left colspan=3 > Time Effeciency:
+        <tr><th align=left > Elapsed time:   <th align=right >$runtime sec     <th align=right > &nbsp;
+        <tr><th align=left > Comparison Time:       <th align=right >$comparetime sec <td align=right > $timepct%
+        <tr><th align=left > Comparison Rate :      <th align=right >$comprate Hz     <td align=right > &nbsp;
+
+    </table>
+
+    <tr><td>
+    <table border id="${base_species}_${alt_species}_detail">
+
+    <tr><th align=left colspan=4> &nbsp; Results By Gene
+
+    <tr><th>Row<th>$base_species<th>$alt_species<th>Score
+
+HTML
+
+    my $i = 0;
+
+    for my $gene
+    (
+        sort $tablesort
+        @$result
+    )
+    {
+        my $td = join '<td>', '', @$gene;
+
+        print join ' ', "\n<tr><th>", ++$i, $td;
+    }
+
+print <<"HTML";
+
+    </table>
+
+</body>
+</html>
+
+HTML
+
+    select STDOUT;
+}
+
+########################################################################
+# real work begins here
+########################################################################
+
+my $tmpdir = join '_', $$, 'tmp';
+
+mkdir $tmpdir;
+
+-d "$tmpdir"
+    or die "$tmpdir";
+
+if( my @cruft = glob "$tmpdir/*" )
+{
+    unlink @cruft
+        or die "Failed cleaning out $tmpdir";
+}
+
+# $genepool->[0] = [ $species_name, $gene_hash ];
+
+$genepool->[0] = read_genbank shift, 0;
+
+my $minlen_mult = 1 - $maxlen;
+my $maxlen_mult = 1 + $maxlen;
+
+@length_que = 
+    map  { [ $_, int $_ * $minlen_mult - 1, int $_ * $maxlen_mult + 2] }
+    sort { $b <=> $a }
+    keys %{$genepool->[0][1]}
+;
+
+print "\nQue length: " . scalar @length_que, "\n";
+
+for( @ARGV )
+{
+    $start = time;
+
+    $genepool->[1] = read_genbank $_, 0;
+
+    # generate the curves for alt dna only once.
+    # simplest way is to pre-generate them, replacing
+    # the dna strings with arrays.
+
+    my @job_que = 
+        map
+        {
+            my $length = $_;
+
+            sub
+            {
+                my $path = "$tmpdir/$length->[0].out";
+
+                open my $fh, '>', $path or die "$path: $!";
+
+                print $fh  Dumper compare_genes $length;
+
+                return 0;
+            }
+        }
+        @length_que
+    ;
+
+    # false numproc runs the que without forking.
+
+    eval
+    {
+        my $comp_start = time;
+
+        if( my @unused = runqueue $numproc, @job_que )
+        {
+            die "Failed execution, remaining: " . scalar @unused;
+        }
+
+        print "\n\nMerging results from $tmpdir...\n\n";
+
+        my @filz = glob "$tmpdir/*.out"
+            or die "Roadkill: no files $tmpdir/*.out";
+
+        print join "\n\t","Reading Data Files:", @filz;
+
+        # expand the file listings into an array of
+        # their contents.
+
+        my @result = 
+            map
+            {
+                local $/;
+
+                print "Merging: $_\r";
+
+                open my $fh, '<', $_ or die "Reading: $_: $!";
+
+                my $matched = eval <$fh>;
+
+                @$matched
+            }
+            @filz
+        ;
+
+        $comparetime = ( time - $comp_start ) || 1;
+
+        # not really worth dying for this, though
+        # keeping the merged data is useful.
+
+        if( open my $fh, '>', "$tmpdir/Result.dump" )
+        {
+            print $fh "\n#Merged results:\n", Dumper \@result;
+        }
+        else
+        {
+            print STDERR "Error writing merged data file: $!";
+        }
+
+        format_output $genepool->[0][0], $genepool->[1][0], \@result;
+    };
+
+    if( $@ )
+    {
+        die "Failed execution, partial results in $tmpdir\n$@";
+    }
+    else
+    {
+        unlink glob "$tmpdir/*" or die "Cleanup $tmpdir: $!";;
+    }
+}
+
+# the temp directory is left behind with a 
+# merged data file for posterity.
+
+# this isn't a module
+
+0
+
+__END__

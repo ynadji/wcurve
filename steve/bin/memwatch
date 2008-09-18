@@ -1,0 +1,54 @@
+#!/opt/bin/perl
+
+use strict;
+
+use IO::File;
+
+use Fatal qw( open seek );
+
+my $fh  = IO::File->new;
+
+open $fh, '<', '/proc/meminfo';
+
+undef $/;
+
+select STDERR;
+$| = 1;
+
+for( my $a = 0 ;; seek $fh, 0, 0 )
+{
+    my ( $b ) = <$fh> =~ m{ ^ MemFree: \s+ (\d+) }xm;
+
+    print time, "\t", $b, "\t", $b - $a, "\n";
+
+    $a = $b;
+
+    sleep 1;
+}
+
+__END__
+
+MemTotal:      8194168 kB
+MemFree:       3662176 kB
+Buffers:           140 kB
+Cached:        3918176 kB
+SwapCached:        580 kB
+Active:        1308500 kB
+Inactive:      2756708 kB
+SwapTotal:        9144 kB
+SwapFree:         7936 kB
+Dirty:              36 kB
+Writeback:           0 kB
+AnonPages:      146656 kB
+Mapped:          16844 kB
+Slab:           413648 kB
+SReclaimable:   374308 kB
+SUnreclaim:      39340 kB
+PageTables:       4224 kB
+NFS_Unstable:        0 kB
+Bounce:              0 kB
+CommitLimit:   4106228 kB
+Committed_AS:  2079344 kB
+VmallocTotal: 34359738367 kB
+VmallocUsed:     57872 kB
+VmallocChunk: 34359679367 kB

@@ -1,0 +1,513 @@
+#!/opt/bin/perl -w
+
+package Harness;
+
+########################################################################
+# compute a list of genes that get w-curved.
+#
+# given an NCBI file, read the chromosome and gene list, then extract
+# the chromosomes with 35bp preceeding the gene.
+########################################################################
+
+########################################################################
+# housekeeping
+########################################################################
+
+use strict;
+use warnings;
+
+$, = "\n\t";
+
+use Carp;
+
+use Getopt::Long;
+
+use Data::Dumper;
+	$Data::Dumper::Purity           = 1;
+	$Data::Dumper::Terse            = 1;
+	$Data::Dumper::Indent           = 1;
+	$Data::Dumper::Deepcopy         = 0;
+	$Data::Dumper::Quotekeys        = 0;
+
+########################################################################
+# command line & package variables
+# anything left on the command line are the genbank files.
+########################################################################
+
+my @optionz = 
+qw(
+	order=s
+	sort=s
+	maxlen=i
+	maxerr=f
+
+	maxproc=i
+
+	verbose+
+	debug+
+
+	test!
+	nofork!
+
+	keepall!
+	help!
+);
+
+my $cmdline = {};
+
+unless( GetOptions $cmdline, @optionz )
+{
+	print STDERR "\nUsage:\n\t$0 [--verbose][--debug] classname file1.gb file2.gb ...\n";
+
+	exit -1;
+}
+
+# control logging messages, automatic breakpoints.
+
+my $verbose = $cmdline->{verbose} || 0;
+my $debug   = $cmdline->{debug} || 0;
+
+my $keepall = $cmdline->{keepall} || 0;
+
+my $maxlen = $cmdline->{maxlen} || 0.15;
+my $maxerr = $cmdline->{maxerr} || 0.25;
+
+my $class = shift or die "Command line missing curve class";
+
+# load the cuve class, check for generate and comapre hooks.
+
+eval "require $class" or die "Failed loading class '$class'";
+
+if( my $sub = $class->can('import') )
+{
+	# resolves to an empty list of order was not given,
+	# which then uses the default order.
+	
+	$sub->( split //, ($cmdline->{order} || '') );
+}
+
+my $curve_gen = $class->can( 'generate' )
+	or die "Bogus class: $class cannot 'generate'.";
+
+my $curve_cmp = $class->can( 'compare' )
+	or die "Bogus class: $class cannot 'compare'.";
+
+$cmdline->{sort} ||= 'name';
+
+my $totalcount = 0;
+
+my $tablesort = __PACKAGE__->can( $cmdline->{sort} )
+	or die "Bogus sorter: $cmdline->{sort}";
+
+# base and alt gene storage.
+
+my $genepool = [];
+
+my @length_que = ();
+
+########################################################################
+# shared code
+########################################################################
+
+########################################################################
+# output sorts
+########################################################################
+
+sub name
+{
+	$a->[0] cmp $b->[0]
+}
+
+sub score
+{
+	$a->[-1] <=> $b->[-1]
+	or
+	$a->[0] cmp $b->[0]
+}
+
+########################################################################
+# slurp the whole-genome NCBI file.
+# extract the organism, all of its genes, and the
+# chromsome.
+#
+########################################################################
+##	if( $no_dna )
+##	{
+##		my @genz =
+##			map { $_->[0] }
+##			sort { $b->[1] <=> $a->[1] or $a->[0] cmp $b->[0] }
+##			map
+##			{
+##				$_->primary_tag eq 'CDS' && $_->has_tag('gene') ? 
+##				[ ($_->get_tag_values('gene'))  => length $_->spliced_seq->{seq} ] : 
+##				()
+##			}
+##			$seq->get_SeqFeatures
+##		;
+##
+##		print "Gene count for $species: " . scalar @genz;
+##		
+##		$genepool{$species} = \@genz
+##	}
+##	else
+##	{
+##		my %genz =
+##		map
+##		{
+##			$_->primary_tag eq 'CDS' && $_->has_tag('gene') ? 
+##			( ($_->get_tag_values('gene'))  => $_->spliced_seq->{seq} ) : 
+##			()
+##		}
+##		$seq->get_SeqFeatures;
+##
+##		print "Gene count for $species: " . scalar keys %genz;
+##		
+##		$genepool{$species} = \%genz
+##	}
+########################################################################
+
+sub read_genbank
+{
+	local $| = 1;
+
+	use Bio::SeqIO;
+
+	my $path = shift
+		or croak "Bogus read_genbank: missing path";
+
+	my $no_dna = shift || 0;
+
+	-e $path or croak "Bogus read_genbank: nonexistant '$path'";
+	-r _     or croak "Bogus read_genbank: unreadable '$path'";
+	-s _     or croak "Bogus read_genbank: empty '$path'";
+
+	#i trick here is to read the file and map out the features.
+	# whether or not this is a whole-genome file, the genes
+	# come back as a list which can be handled via map.
+	#
+	# for whatever reason, next-seq returns only a single 
+	# item for whole-genome files.
+
+	my $fh = Bio::SeqIO->new( -file => $path, -format => 'GenBank' )
+		or die "Roadkill: unable to open B::SeqIO: $!";
+
+	my $seq = ( $fh->next_seq )[ 0 ];
+
+	my $species = $seq->{species}->common_name;
+
+	print "Species: $species\n";
+		
+	if( $verbose > 1 )
+	{
+		print "Writing $species.dump\n";
+
+		open my $fh, '>', "$species.dump" or die "$species: $!";
+
+		print $fh Dumper($seq), "\n";
+	}
+	
+	# $genz gets stored in the genepool by species key.
+	# it will contain arrays of gene names (dispatcher)
+	# or combined gene name and DNA string (compute).
+	#
+	# for a given min & max length,
+	#
+	#	@{$genz}{$min..$max}
+	#
+	# are the genes that seem worth comparing based on 
+	# their length. the dispatcher only needs gene names,
+	# the compute nodes need a name along with the dna. 
+
+	my $genz = {};
+
+	my $count = 0;
+
+	for( $seq->get_SeqFeatures )
+	{
+		next unless $_->primary_tag eq 'CDS' && $_->has_tag('gene');
+
+		my $g = ( $_->get_tag_values('gene') )[0];
+		my $s = $_->spliced_seq->{seq};
+		my $l = $no_dna ? 
+			length $_->spliced_seq->{seq} :
+			length (my $dna = $_->spliced_seq->{seq} )
+		;
+
+		$genz->{$l}{$g} = $no_dna ? '' : $dna; 
+
+		++$count;
+	}
+
+	# caller gets back the species name and gene hash.
+
+	[ $species, $genz, $count ]
+}
+
+# given arrays of base and alt species genes, compare them
+# using the provided class' generate and compare hooks.
+# for each base gene, pick the two best (lowest) stores and
+# dump the second one if it is more than 50% larger than the
+# best one.
+#
+# caller gets nothing returned back: all of the updates are
+# in the output hash.
+
+sub compare_genes
+{
+	$DB::single = $debug;
+
+	my $length = shift
+		or croak "Bogus compare_genes: missing length que entry";
+
+	print join ' ', 'Length:', @$length, "\n";
+
+	my @matched = ();
+
+	if
+	(
+		my @alt  =
+			grep { defined }
+			@{ $genepool->[1][1] }{$length->[1] .. $length->[2]}
+	)
+	{
+
+		my $base = @{ $genepool->[0][1] }{ $length->[0] }
+			or croak "Bogus compare_genes: no base genes for length $length";
+
+		print join "\n\t",
+			"\nComparing:",
+			keys %$base,
+			( map { keys %$_ } @alt ),
+			"\n"
+		;
+
+		while( my($base_gene, $base_dna) = each %$base )
+		{
+			# prep the cache with the first piece of 
+			# base-species dna.
+
+			my $cache = [];
+
+			$curve_gen->( $base_dna, 0, $cache );
+
+			my $best_gene = '';
+			my $best_score = $maxerr;
+
+			for( @alt )
+			{
+				while( my($alt_gene, $alt_dna) = each %$_ )
+				{
+					++$totalcount;
+
+					# fold in the alternate species' dna and 
+					# run the comparison. undef signifies that
+					# the curve generation aborted due to local
+					# values exceeding the cutoff.
+
+					$curve_gen->( $alt_dna, 1, $cache );
+
+					next unless
+						defined( my $i = $curve_cmp->($cache) );
+					
+					if( $keepall )
+					{
+						push @matched, [ $base_gene, $alt_gene, $i ]
+							if $i < $maxerr;
+					}
+					elsif( $i < $best_score )
+					{
+						$best_gene = $alt_gene;
+						$best_score = $i;
+					}
+				}
+
+			}
+
+			push @matched, [ $base_gene, $best_gene, $best_score ]
+				unless $keepall || $best_score >= $maxerr;
+		}
+	}
+	else
+	{
+		print STDERR "No alternate genes for @$length";
+	}
+
+
+	# caller gets back the matched genes.
+
+	\@matched
+}
+
+########################################################################
+# convert the results array into an html table.
+
+sub format_output
+{
+	my $base_species = shift
+		or croak "Bogus format_output: missing base_species";
+
+	my $alt_species = shift
+		or croak "Bogus format_output: missing alt_species";
+
+	my $result = shift
+		or croak "Bogus format_output: missing result";
+
+	my $curveid =
+		$class->can( 'idstring' ) ? $class->idstring : $class;
+
+	my $path =
+		join '-', $base_species, $alt_species, $curveid, $cmdline->{sort};
+	
+	$path =~ s/\s+/_/g;
+
+	$path .= '.html';
+
+	open my $fh, '>', $path or die "$path: $!";
+
+	# total number of genes found may not equal the 
+	# number of table rows if multiple rows are 
+	# displayed for a given gene...
+
+	my $rowcount = @$result;
+
+	my %matched = map { $_->[0], 1 } @$result;
+
+	my $matched = scalar keys %matched;
+
+	my $compcount = 0;
+	my $basecount = 0;
+	my $altcount  = 0;
+
+	for my $length ( @length_que )
+	{
+		my $i = 0;
+		my $j = 0;
+
+		$i += keys %$_
+			for @{$genepool->[0][1]}{ $length->[0] };
+
+		$j += keys %$_
+			for @{$genepool->[1][1]}{ $length->[1]..$length->[2] };
+
+		$basecount += $i;
+		$altcount  += $j;
+		$compcount += $i * $j;
+	}
+
+	my $totalcount = $genepool->[0][2] * $genepool->[1][2];
+
+	my $curvetitle =
+		$class->can( 'heading' ) ? $class->heading : $class;
+
+	my $genepct = ( int 10000 * $matched/$totalcount ) / 100;
+	my $basepct = ( int 10000 * $basecount/$totalcount ) / 100;
+	my $altpct  = ( int 10000 * $altcount/$totalcount ) / 100;
+
+	select $fh;
+
+	# note: there's a reason to keep the header portion
+	# indented: /^<tr>/ finds the data rows for post-
+	# processing.
+
+	print <<"HTML";
+<html>
+<head>
+	<title>
+	Whole-genome comparison of $base_species to $alt_species
+	</title>
+</head>
+<body>
+
+	<table border id="${base_species}_${alt_species}">
+	<tr><th colspan=4>Whole Gnome Comparison:<i>$base_species</i>, <i>$alt_species</i>
+	<tr><th align=left > &nbsp; Curve Used:    <th colspan=3 align=left >&nbsp; $curvetitle
+	<tr><th align=left > &nbsp; Score Cutoff:  <th colspan=3 align=left >&nbsp; $maxerr
+	<tr><th align=left > &nbsp; Length Cutoff: <th colspan=3 align=left >&nbsp; $maxlen%
+	<tr><th align=left > &nbsp; Matched genes: <th colspan=3 align=left >&nbsp; $matched ($genepct% of total)
+	<tr><th align=left > &nbsp; Compared base genes: <th colspan=3 align=left >&nbsp; $basecount ($basepct% of total)
+	<tr><th align=left > &nbsp; Compared alt genes: <th colspan=3 align=left >&nbsp; $altcount ($altpct% of total)
+	<tr><th align=left > &nbsp; Total genes:   <th colspan=3 align=left >&nbsp; $totalcount
+	<tr><th>Row<th>$base_species<th>$alt_species<th>Score
+
+HTML
+
+	my $i = 0;
+
+	for my $gene
+	(
+		sort $tablesort
+		@$result
+	)
+	{
+		my $td = join '<td>', '', @$gene;
+
+		print join ' ', "\n<tr><th>", ++$i, $td;
+	}
+
+print <<"HTML";
+
+	</table>
+
+</body>
+</html>
+
+HTML
+
+	select STDOUT;
+}
+
+########################################################################
+# real work begins here
+########################################################################
+
+# $genepool->[0] = [ $species_name, $gene_hash ];
+
+print "\nReading base from: $ARGV[0]\n";
+
+$genepool->[0] = read_genbank shift, 0;
+
+my $minlen_mult = 1 - $maxlen;
+my $maxlen_mult = 1 + $maxlen;
+
+@length_que = 
+	map  { [ $_, int $_ * $minlen_mult - 1, int $_ * $maxlen_mult + 2] }
+	sort { $b <=> $a }
+	( 114 ) #keys %{$genepool->[0][1]}
+;
+
+print "\nQue length: " . scalar @length_que, '';
+print join "\n\t", "\nLength Que:", @length_que, ''
+	if $verbose;
+
+for( @ARGV )
+{
+	$genepool->[1] = read_genbank $_, 0;
+
+	print "\nAlt Species: $genepool->[1][0]\n";
+
+	my @result = ();
+
+	LENGTH:
+	for( @length_que )
+	{
+		if( my $matched = compare_genes $_, $genepool )
+		{
+			push @result, @$matched
+		}
+		else
+		{
+			print STDERR "No genes matched for length $_->[0]";
+			next LENGTH;
+		}
+	} 
+
+	format_output $genepool->[0][0], $genepool->[1][0], \@result;
+
+}
+
+
+# this isn't a module
+
+0
+
+__END__

@@ -1,0 +1,295 @@
+#!/usr/local/bin/perl
+########################################################################
+# housekeeping
+########################################################################
+
+use strict;
+
+use feature qw( :5.10 );
+
+use File::Find;
+use FindBin::libs;
+use IO::File;
+
+use Benchmark       qw( :hireswallclock );
+use Cwd             qw( abs_path );
+use Fatal           qw( open close );
+use Scalar::Util    qw( looks_like_number );
+
+use WCurve;
+
+########################################################################
+# package variables & sanity checks
+########################################################################
+
+@ARGV or die "Missing input file arguments";
+
+my $jobs    = looks_like_number $ARGV[0] ? shift : 2;
+
+my @maskz   = map { '0' . ( 2 ** $_ ) } ( 1 .. $jobs );
+
+my $cutoff  = looks_like_number $ARGV[0] ? shift : 0.60;
+
+$cutoff > 0 or die "'$cutoff' is not a positive value'";
+
+my $timz    = [ [ Init => Benchmark->new ] ];
+
+my $count   = 0;
+
+my $parent  = $$;
+
+my $vardir  = abs_path $FindBin::Bin . '/../var/output/';
+
+my $nofork  = $^P || $ENV{ NOFORK };
+
+########################################################################
+# read all of the inputs into a hash by length, these will be
+# processed longest to shortest for comparision.
+########################################################################
+
+select STDERR;
+$|  = 1;
+
+$\  = "\n";
+$,  = "\t";
+
+print "\nReading:", @ARGV;
+
+my @curvz   = sort grep { -f } map { glob $_ . '*' } @ARGV;
+
+my @accz    = ();
+
+for( @curvz )
+{
+    my ( $head, $seq )
+    = do
+    {
+        my $fh  = IO::File->new;
+
+        local $/;
+
+        open $fh, '<', $_;
+
+        split /\n/, <$fh>, 2
+    };
+
+    my ( $id, $species )
+    = $head
+    =~ m
+    {
+        ^>              # anchor on the leading >
+        ( \S+ )         # identifier => non-space
+        \s+             # space separator
+        ( [A-Z][^;]+ )  # species w/o cap => junk
+    }x;
+
+    if( $id && ! -e "$vardir/$id.out" )
+    {
+        print "Process:  $id ($species)";
+
+        $seq    =~ s{ \W+ }{}gx;
+
+        $_ = eval { WCurve->generate( $seq, $id, $species ) };
+    }
+    elsif( -e _ )
+    {
+        print "Existing: $id";
+
+        undef $_;
+    }
+    else
+    {
+        print "Ignore:   $head";
+
+        undef $_;
+    }
+
+};
+
+@curvz  = grep { $_ } @curvz;
+
+print 'Curves generated: ' . @curvz;
+
+my %pathz   = ();
+
+my $count   = @curvz;
+
+sub compare
+{
+    my $base    = shift @curvz;
+
+    my $path    = "$vardir/$base.out";
+
+    given( $nofork ? 0 : fork )
+    {
+        when( undef )
+        {
+            die "Phorkafobia: $!"
+        }
+
+        when( 0     )
+        {
+            # child
+
+            my $t0      = Benchmark->new;
+
+            open my $fh, '>', $path;
+
+            print $fh "$base";
+
+            print $fh "$_", $base->compare( $_ ) for @curvz;
+
+            my $t1      = Benchmark->new;
+
+            print $$, "$base", timestr timediff $t1, $t0;
+
+            $^P or exit 0;
+        }
+
+        default
+        {
+            my $mask    = $maskz[ @curvz % @maskz ];
+
+            system 'taskset', '-p', $mask, $_;
+
+            $pathz{ $_ } = $path;
+
+            print $$, scalar @curvz, "$base ($mask)";
+        }
+    }
+}
+
+# split off the job count, then for
+# 1 .. curvz - 1 process that many
+# more jobs.
+
+compare for 1 .. $jobs;
+
+while( @curvz )
+{
+    given( wait )
+    {
+        when( -1 ) {}
+
+        default
+        {
+            my $pid     = $_;
+
+            my $path    = delete $pathz{ $pid };
+
+            given( $? >> 8 )
+            {
+                when( 0 ) {}
+
+                default
+                {
+                    print "\nNon-zero exit: $pid ($path)";
+                }
+            }
+        }
+    }
+
+    compare;
+}
+
+0
+
+__END__
+
+push @$timz, [ Input => Benchmark->new ];
+
+# at this point all of the usable sequences
+# have been stored, now generate curves for
+# all of them.
+
+# sort the items lexically then by length.
+
+print "\nSequences by length, accno:";
+
+for my $length ( sort { $b <=> $a } keys %lengthz )
+{
+    print "\nLength: $length";
+
+    my $group = delete $lengthz{ $length };
+
+    for my $gid ( sort keys %$group )
+    {
+        my( $head, $curve ) = @{ delete $group->{ $gid } };
+
+        print "\t$head";
+        push @curvz,    $curve;
+        push @identz,   $gid;
+    }
+}
+
+push @$timz, [ Sort => Benchmark->new ];
+
+# given the curves by length, compare them
+# to one another.
+
+my $total   = $count * ( $count + 1 ) * 0.50;
+
+print "\n\nProcessing: $total comparisons with cutoff $cutoff\n\n";
+
+my $prior   = [ gettimeofday ];
+
+print STDOUT scalar @curvz;
+
+my $handler
+= sub
+{
+    for( 2 .. @curvz )
+    {
+        my $loop    = [ gettimeofday ];
+
+        my $head    = shift @curvz;
+        my $ident   = sprintf '%10.10s', shift @identz;
+
+        print STDOUT
+        $ident, map { WCurve::compare $cutoff, $head, $_ } @curvz;
+
+        my $time    = tv_interval $loop, [gettimeofday];
+
+        my $comp    = 0.5 * @curvz * ( @curvz + 1 );
+        my $pct     = int ( 10_000 * $comp / $total ) / 100;
+        my $rate    = int( @curvz / $time );
+        my $time    = int( $comp / $rate );
+
+        print "Finished: $ident, Remaining: $comp ($pct\%) @ $rate Hz = ${time}s";
+    }
+
+    printf STDOUT "%-10.10s\n", $identz[0];
+};
+
+&$handler;
+
+my $after   = [ gettimeofday ];
+
+push @$timz, [ Compare => Benchmark->new ];
+
+print "\n\nBenchmarks:";
+
+printf "%16s: %s\n", 'Total', timestr timediff $timz->[-1][1], $timz->[0][1];
+
+while( @$timz > 1 )
+{
+    my $t0 = shift @$timz;
+    my $t1 = $timz->[0];
+
+    my $time = timestr timediff $t1->[1], $t0->[1];
+
+    printf "%16s: %s\n", $t1->[0], $time;
+}
+
+my $time    = tv_interval $prior, $after;
+my $total   = $count * ( $count + 1 ) / 2;
+
+my $hz      = ( int $total / $time );
+
+print "\nAverage rate: $hz ($count seq, $total comp, $time sec)\t";
+
+print "\nExit";
+
+0
+
+__END__

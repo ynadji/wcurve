@@ -1,0 +1,107 @@
+#!/opt/bin/perl
+
+$\ = "\n";
+$, = "\n";
+
+use strict;
+use warnings;
+
+use File::Basename qw( &basename );
+
+
+sub read_genome
+{
+	# grab a copy of the local genbank file as a Bio::SeqIO.
+	# the only useful thing from it are the features whose
+	# primary tag is a gene.
+
+	use Bio::SeqIO;
+
+	my @seqargz = ( qw( -format genbank -file ), shift );
+
+	my $fh = Bio::SeqIO->new( @seqargz);
+
+	my $seq = ( $fh->next_seq )[0];
+
+	my ( $species ) = $seq->{species}->common_name =~ m{^(\S+\s+\S+)};
+
+
+	(
+		$species,
+		[
+			grep { $_->primary_tag eq 'gene' } 
+			$seq->get_SeqFeatures
+		]
+	)
+}
+
+sub gene_sequences
+{
+	# first step: slurp the genes only.
+
+	my ( $species, $genome ) = read_genome shift;
+
+	# now map the names onto their sequences.
+	# caller gets back anonymous hash of the
+	# gene names mapped onto their sequences.
+
+	my $gene_seqz =
+	{
+		map
+		{
+			(
+				$_->get_tag_values('gene'),
+				$_->spliced_seq->seq
+			)
+		}
+		@$genome
+	};
+
+	# at this point the genome and SeqIO objects can 
+	# be discarded: all we need going forward is the 
+	# the text handed back here.
+
+	( $species, $gene_seqz )
+}
+
+for my $input ( @ARGV )
+{
+	my ( $species, $genome ) = gene_sequences $input;
+
+	( my $base = $species ) =~ s/\s+/_/g;
+
+	while( my($gene,$seq) = each %$genome )
+	{
+		my $path = "$base.$gene.fasta";
+
+		print STDERR $path;
+
+		open my $fh, '>', $path or die "$path: $!";
+
+		print $fh "> $input, $species, $gene", '', $seq =~ /.{1,80}/g;
+	}
+}
+
+0
+
+__END__
+
+use Bio::SeqIO;
+use strict;
+
+my $file = shift or die "Genbank file?\n";
+my $io = Bio::SeqIO->new(-file => $file);
+my $seq = $io->next_seq;
+
+foreach my $feat ($seq->get_SeqFeatures)
+{
+	if ($feat->primary_tag eq "gene")
+	{
+		print "DNA sequence: ",$feat->spliced_seq->seq,"\n";
+		foreach my $val ($feat->get_tag_values('gene'))
+		{
+			print "gene: ",$val,"\n";
+		}
+	}
+}
+
