@@ -1,0 +1,6 @@
+- Add CXXFLAGS="$CXXFLAGS $USE_EXCEPTIONS" immediately after AC_CHECK_COMPILERS in configure.in
+- --prefix=/usr --with-qt-includes=/usr/include/qt3 --with-qt-libraries=/usr/lib/qt3
+- libGLU.so MUST be found in /usr/X11R6/lib/libGLU.so for some reason...
+- add #include "displaylist.h" to plotview.cpp
+- change inline bool addVertex(Vector3D<float> &vec); to bool addVertex(Vector3D<float> &vec); in displaylist.h
+- FINALLY, CGAL isn't linked properly, so adding -lCGAL to the end of the last g++ call compiles/links everything properly. once again, I'm not sure why this is the case
