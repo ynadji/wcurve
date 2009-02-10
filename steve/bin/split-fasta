@@ -1,0 +1,70 @@
+#!/opt/bin/perl
+########################################################################
+# housekeeping
+########################################################################
+
+use strict;
+use Fatal qw( open close );
+use File::Basename;
+use FindBin qw( $Bin );
+
+my $src = shift or die "Missing source file";
+my $dir = shift or die "Missing dest dir";
+
+open my $input, '<', $src or die "$src: $!";
+
+select STDOUT;
+$| = 1;
+
+$/ = "\n>";
+
+my $logdir  = "$Bin/../var/log/";
+
+-d $logdir || mkdir $logdir, 02775 or die "$logdir: $!";
+
+open my $bogus, '>', $logdir . basename $0;
+
+########################################################################
+
+do
+{
+    # discard the initial '>'
+
+    local $/ = '>';
+
+    <$input>
+};
+
+while( <$input> )
+{
+    chomp;
+
+    my ( $head, $seq ) = split /\n/, $_, 2;
+
+    if( $head =~ m{ ^ \s* $ } )
+    {
+        print $bogus "\nBogus header: $.\n$head\n$seq\n";
+
+        next
+    }
+    elsif( $seq =~ m{ [^CATG\s] }ix )
+    {
+        $seq =~ tr/CATGcatg/......../;
+
+        print $bogus "\nBogus sequence: $.\n$head\n$seq\n";
+
+        next
+    }
+    
+    my ( $ident ) = $head =~ m{ ^ (\S+) }x;
+
+    print "$. $ident\r";
+
+    open my $output, '>', "$dir/$ident.fa";
+
+    print $output '>', $head, "\n", uc $seq;
+}
+
+0
+
+__END__

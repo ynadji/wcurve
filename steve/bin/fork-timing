@@ -1,0 +1,43 @@
+#!/opt/bin/perl
+
+use strict;
+use feature     qw( :5.10 );
+
+use Benchmark qw( :hireswallclock );
+
+my %timingz =
+(
+    given =>
+    sub
+    {
+        for( 1 .. 1_000_000 )
+        {
+            given( fork )
+            {
+                when( undef )   { die "Phorkafobia: $!" }
+
+                when ( 0    )   { exit 0                }
+
+                default         { wait                  }
+            }
+        }
+    },
+
+    elseif =>
+    sub
+    {
+        for( 1 .. 1_000_000 )
+        {
+            for( scalar fork )
+            {
+                if( !defined )  { die "Phorkafobia: $!" }
+
+                elsif ( ! $_ )  { exit 0                }
+
+                else            { wait                  }
+            }
+        }
+    },
+);
+
+timethese 1, \%timingz;

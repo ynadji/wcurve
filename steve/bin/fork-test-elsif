@@ -1,0 +1,19 @@
+#!/opt/bin/perl
+
+use strict;
+
+for( ;; )
+{
+    for( scalar fork )
+    {
+        if (!defined)   { die "Phorkafobia: $!" }
+
+        elsif ( ! $_ )  { exit 0 }
+
+        else            { wait }
+    }
+}
+
+exit 0;
+
+__END__

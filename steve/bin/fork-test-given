@@ -1,0 +1,20 @@
+#!/opt/bin/perl
+
+use strict;
+use feature     qw( :5.10 );
+
+for( ;; )
+{
+    given( fork )
+    {
+        when( undef )   { die "Phorkafobia: $!" }
+
+        when ( 0    )   { exit 0                }
+
+        default         { wait  }
+    }
+}
+
+exit 0;
+
+__END__

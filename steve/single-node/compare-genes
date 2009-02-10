@@ -1,0 +1,783 @@
+#!/opt/bin/perl -w
+
+########################################################################
+# compute a list of genes that get w-curved.
+#
+# given an NCBI file, read the chromosome and gene list, then extract
+# the chromosomes with 35bp preceeding the gene.
+########################################################################
+
+# control logging messages, automatic breakpoints.
+# used as $::verbose throughout.
+
+our $verbose = 0;
+our $debug   = 0;
+
+########################################################################
+# housekeeping
+########################################################################
+
+use Carp;
+
+########################################################################
+# shared code
+########################################################################
+
+########################################################################
+# slurp the whole-genome NCBI file.
+# extract the organism, all of its genes, and the
+# chromsome.
+#
+# caller gets back a name string, list of genes, and
+# the chromosome.
+
+sub read_ncbi
+{
+	local $/;
+	local $\ = "\n";
+
+	my $pool = shift
+		or croak "Bogus read_ncbi: missing pool";
+
+	my $store_dna = shift;
+
+	defined $store_dna
+		or croak "Bogus read_ncbi: missing dna switch";
+
+	my $path = shift
+		or croak "Bogus read_ncbi: missing NCBI file path";
+
+	print "\nReading file: $path" if $::verbose;
+
+	# suck in the NCBI file and grab a list of genes (offsets
+	# + compliment flag) and the DNA.
+
+	open my $fh, '<', $path
+		or die "Roadkill: $path: $!";
+
+	my $ncbi = <$fh>;
+
+	my ( $name ) = $ncbi =~ /ORGANISM\s+(.+)/;
+
+	if( $store_dna )
+	{
+		my %genz = reverse ($ncbi =~ m{\s+gene\s+((?:\w*\()?\d+..\d+).+?/gene="(.+?)"}gs);
+
+		# keyed by gene names, the values begin as
+		# DNA sequences that are eventually converted
+		# to w-curves.
+
+		my $chromstart = index $ncbi, "\nORIGIN";
+
+		# grab the dna sequence out of the file, strip
+		# all non-genetic values out of it (mainly \n).
+		#
+		# note: this should really use BioPerl.
+
+		( my $dna = lc substr $ncbi, $chromstart ) =~ s{[^catg]}{}g;
+
+		for( values %genz )
+		{
+			my( $start, $end ) = /(\d+)/g;
+
+			my $length = $end - $start;
+
+			$_ = substr $dna, $start-1, $end - $start;
+
+			if( /compliment/ )
+			{
+				tr/catg/gtac/;
+				$_ = reverse $_;
+			}
+		}
+
+		$pool->{$name} = \%genz;
+	}
+	else
+	{
+		# master node doesn't use the DNA anyway, simpler to
+		# store it in an array and be done with it.
+
+		my %genz =
+			map { $_ => undef }
+			( $ncbi =~ m{gene\s+.+?\n.+?/gene="(\w+)"}gs );
+
+		$pool->{$name} = \%genz;
+	}
+
+	print "\nOrganism: $name"
+		if $verbose;
+
+	# caller gets back the genepool key for this set of genes.
+
+	$name
+}
+
+
+{ 	# isolate metadata
+
+	package Compute;
+
+	# automatically turn on profiling
+
+	$ENV{PERL_PROFILE_SAVETIME} = 0;
+
+	use strict;
+
+	# CPAN modules
+
+	use FindBin qw( $Bin );
+
+	use Carp;
+
+	use Date::Format;
+
+	use Data::Dumper;
+
+		local $Data::Dumper::Purity		= 1;
+		local $Data::Dumper::Terse		= 1;
+		local $Data::Dumper::Indent		= 1;
+		local $Data::Dumper::Deepcopy	= 0;
+		local $Data::Dumper::Quotekeys	= 0;
+
+	BEGIN
+	{
+		no strict 'refs';
+
+		*{ __PACKAGE__ . '::read_ncbi' } = \&::read_ncbi;
+
+		# avoid nastygrams if profiling is not turned on
+
+		*{'DB::save'}	= sub{} unless *DB::save{CODE} ;
+		*{'DB::reset'}	= sub{} unless *DB::reset{CODE} ;
+	}
+
+	########################################################################
+	# package variables
+	########################################################################
+
+	my %metadata = ( param => {} );
+
+	my $paramz = $metadata{param};
+
+	# used for message exchange with compute node.
+
+	our @reply = ();
+
+	# pool of currently loaded data from genbank files.
+	# populated/purged by handle_file and handle_purge.
+
+	our $genepool = {};
+
+	# currently loaded name/gene pairs in the cache of w-curves.
+	# comparing $curz[$offset]->{name} or ->{gene}.
+
+	my @curz = ();
+
+	# currently generated w-curves.
+	# generator and comparison sub's from the current class
+
+	my @wcache = ();
+
+	########################################################################
+	# subroutines
+	########################################################################
+
+	########################################################################
+	# compute node
+	########################################################################
+
+	########################################################################
+	# message handlers
+	########################################################################
+
+	# stubs for now
+
+	sub reply_error { unshift @reply, shift }
+
+	sub send_reply { push @reply, @_ }
+
+	########################################################################
+	# read a message and dispatch it w/in the compute package.
+
+	sub read_message
+	{
+		$DB::single = 1 if $debug > 1;
+
+		my $name = shift
+			or croak "Bogus handle_param: no parameter name";
+
+		print "\nMesage: $name" if $::verbose;
+
+		# sub's for specific messages:
+		#
+		#	class
+		#	file
+		#	name
+		#	purge
+		#	gene
+
+		if( my $sub = __PACKAGE__->can("handle_$name") )
+		{
+			$paramz->{$name} = \@_;
+
+			$sub->( @_ );
+		}
+		else
+		{
+			# update the metadata for defined values,
+			# otherwise just send back the current
+			# setting.
+
+			my $param = shift
+				or die "Bogus message: Missing parameter name";
+
+			# this might legitimately be undef for some cases, 
+			# only thing to do is take it as is...
+
+			my $value = shift;
+
+			$paramz->{$param} = $value if defined $value;
+
+			send_reply $paramz->{$param};
+		}
+
+		()
+	}
+
+
+	########################################################################
+	# handle the class name for generating/comparing the w-curve classes.
+
+	sub handle_class
+	{
+		$DB::single = 1 if $debug > 1;
+
+		my $class = shift
+			or croak "Bogus handle_class: missing curve class";
+
+		print "\nHandling: $class";
+
+		eval
+		{
+			require "$class.pm";
+
+			for( qw( import init ) )
+			{
+				if( my $sub = $class->can($_) )
+				{
+					$sub->( $class );
+				}
+			}
+
+			$paramz->{wgen} = $class->can( 'generate' )
+				or die "$class cannot generate";
+
+			$paramz->{wcomp} = $class->can( 'compare' )
+				or die "$class cannot compare";
+		};
+
+		reply_error $@ if $@;
+
+		# all the caller cares about is in the class def's.
+
+		0
+	}
+
+	########################################################################
+	# handle the "file" message by reading a file.
+	# this has to pass a true first value into read_ncbi to read the
+	# genetic sequences.
+	#
+	# results in the file being read into $genepool->{name}
+	# with $genepool->{$name} = { geneid => "dna", ... }
+
+	sub handle_file
+	{
+		$DB::single = 1 if $debug > 1;
+
+		print "\nHandling file: $_[0]";
+
+		my $path = shift
+			or croak "Bogus handle_file: missing path argument";
+
+		send_reply read_ncbi $genepool, 1, $path;
+
+		()
+	}
+
+	########################################################################
+	# handle a name message. all this really has to do is store the
+	# genepool entry in the chrom's list.
+	#
+	# puts the chromosome data in $genepool->{$name} into the
+	# entry in @chromz for further use. basically this just
+	# caches the information of which organism is name0 or
+	# name1.
+
+	sub handle_species
+	{
+		$DB::single = 1 if $debug > 1;
+
+		print "\nAdding name(offset): $_[0] ($_[1])";
+
+		my $name = shift
+			or reply_error "Bogus handle_name: missing name";
+
+		my $offset = shift;
+
+		$offset =~ /^[01]$/
+			or reply_error "Bogus handle_name: '$offset' not 0 or 1";
+
+		$genepool->{$name}
+			or reply_error "Bogus name: '$name' not in genepool";
+
+		my $curr = $curz[$offset] ||= { name => '' };
+
+		unless( $name eq $curr->{name} )
+		{
+			@{$curr}{qw(name gene)} = ( $name, '' );
+
+			exists $genepool->{$name}
+				or croak "Bogus name: '$name' not in genepool";
+
+			@wcache = () unless $offset;
+		}
+
+		print "\nName Result:\n", Dumper $curr;
+
+		send_reply scalar %$curr ? 1 : 0;
+
+		()
+	}
+
+	########################################################################
+	# called to free up genepool entries
+
+	sub handle_purge
+	{
+		$DB::single = 1 if $debug > 1;
+
+		print "\nPurging name: $_[0]";
+
+		my $name = shift
+			or reply_error "Bogus handle_purge: missing name";
+
+		delete $genepool->{$name} if exists $genepool->{$name};
+
+		$_->{name} eq $name and $_ = {} for @curz;
+
+		send_reply $name;
+
+		()
+	}
+
+	########################################################################
+	# gene messages handler.
+	# put the genepool entry for this gene into the genes list.
+	#
+	# given an offset in @chromz and gene name, merge the dna
+	# string in $chromz[$offset]->{$gene} into @wcache. if the
+	# offset is 0 then @wcache is truncated to the length of
+	# dna in the requested gene; if the offset is 1 then the
+	# cache is extended as necessary with placeholders entires
+	# inserted
+	# into the 0-offset values.
+	#
+	# generator called with:
+	#
+	#	dna string
+	#	offset
+	#	cache
+
+	sub handle_gene
+	{
+		$DB::single = 1 if $debug > 1;
+
+		print "\nNew gene$_[1]: $_[0]" if $::verbose;
+
+		my $gene = shift
+			or reply_error "Bogus handle_gene: missing gene";
+
+		( my $offset = shift ) =~ /^[01]$/
+			or reply_error "Bogus handle_gene: offset not [01]";
+
+		my $curr = $curz[$offset];
+
+		unless( $curr->{gene} eq $gene )
+		{
+			$curr->{gene} = $gene;
+
+			my $pool = $genepool->{$curr->{name}};
+
+			$curr->{length} = length $pool->{$gene};
+
+			if( $offset )
+			{
+				# truncate the cache to the first dna string's
+				# length. the generator will extend it if necessary.
+
+				$#wcache = $curz[0]->{length};
+
+				# if the d% between the genes is more than the
+				# maximum length difference then this is a waste
+				# of time.
+
+				my ( $short, $long ) = sort { $a <=> $b }
+					$curz[0]->{length}, $curz[1]->{length};
+
+				if( $paramz->{maxlen} > ( $long - $short ) / $short )
+				{
+					print "\nGenerating curve$offset: $curr->{name}, $curr->{gene}"
+						if $verbose > 1;
+
+					my @genargz =
+					(
+						$pool->{$gene},
+						$offset,
+						\@wcache
+					);
+
+					$paramz->{wgen}->( @genargz );
+
+					send_reply $curr->{length};
+				}
+				else
+				{
+					print "\nMismatched length: $curz[1]->{length}"
+						if $::verbose > 1;
+
+					send_reply -$curr->{length};
+				}
+			}
+			else
+			{
+				# start over with a new wcache.
+				#
+				# note: there should be a better way to do this, for
+				# now discarding the cache works well enough.
+
+				print "\nRestarting w-cache with: $curr->{name}, $curr->{gene}"
+					if $::verbose > 1;
+
+				@wcache = ();
+
+				my @genargz =
+				(
+					$pool->{$gene},
+					0,
+					\@wcache
+				);
+
+				$paramz->{wgen}->( @genargz );
+
+				send_reply $curr->{length};
+			}
+
+		}
+
+		print "\nGene Result:\n", Dumper $curr
+			if $::verbose;
+
+		# nothing to hand back, the reply was sent when the genes
+		# were generated or the cache was reset.
+
+		()
+	}
+
+	########################################################################
+	# where the deed gets done: actually perform the comparison.
+	# at this point the 0 and 1 offsets of @chromz have been filled.
+	# this has to check if $chromz[0] is a w-curve or DNA string and
+	# convert it if necessary.
+
+	sub handle_compare
+	{
+		$DB::single = 1 if $debug > 1;
+
+		for( 0, 1 )
+		{
+			defined $curz[$_]
+				or reply_error "Bogus handle compare: no \$curz[$_]";
+
+			defined $wcache[$_]
+				or reply_error "Bogus handle compare: no \$wcache[$_]";
+		}
+
+		print "\nComparing:\n", Dumper \@curz if $::verbose;
+
+		send_reply $paramz->{wcomp}->( $paramz->{maxbad}, \@wcache );
+
+		# caller doesn't need anything back.
+
+		()
+	}
+}
+
+########################################################################
+# master node
+########################################################################
+
+{	# isolate metadata
+
+	####################################################################
+	# housekeeping
+	####################################################################
+
+	package Master;
+
+	BEGIN
+	{
+		no strict 'refs';
+
+		*{ __PACKAGE__ . '::read_ncbi' } = \&::read_ncbi;
+
+	}
+
+	use strict;
+
+	# CPAN modules
+
+	use FindBin qw( $Bin );
+
+	use Carp;
+
+	use Date::Format;
+
+	use Data::Dumper;
+
+		local $Data::Dumper::Purity		= 1;
+		local $Data::Dumper::Terse		= 1;
+		local $Data::Dumper::Indent		= 1;
+		local $Data::Dumper::Deepcopy	= 0;
+		local $Data::Dumper::Quotekeys	= 0;
+
+	####################################################################
+	# package variables and sanity checks
+	####################################################################
+
+	# class == name of class that processes the curves.
+	#
+	# maxbad == max avg badness/base before comparison aborts.
+	# this is cumulative along the length of a gene being
+	# compared and may end up being unrelated to the actual
+	# measure returned. its use is in truncating the comparision
+	# quickly when the fit is unlikely to return something useful.
+	#
+	# maxlen == max (b-a)/a for longer gene / shorter gene before
+	# the comparison is igored. this may have to heavily tuned on
+	# a per-compare basis, especially for genetic DNA in eucaryotes.
+	#
+	# nodes == list of PVM cluster node names used for comparision.
+
+	my %metadata =
+	(
+		class	=> 'WCurve',
+
+		maxlen	=> 0.15,
+
+		maxbad	=> 0.26,
+
+		nodes	=> [qw( larry moe curly )],
+	);
+
+	my @id = ( 0..5 );
+
+	my ( $name0, $gene0, $len0, $name1, $gene1, $len1 )
+		= \( @id );
+
+	####################################################################
+	# stubbed message handlers for now.
+
+	sub read_reply { shift @Compute::reply }
+
+	sub send_message
+	{
+		Compute::read_message @_;
+
+		read_reply;
+	}
+
+	####################################################################
+	# real work begins here
+	####################################################################
+
+	our $genepool = {};
+
+	# grab the initial gene. the values are used to store
+	# badness returns from the cluster and can be discarded
+	# at this point.
+
+	send_message 'param', $_, $metadata{$_} for qw( maxbad maxlen );
+
+	send_message 'class', $metadata{class};
+
+	send_message 'file', $ARGV[0], 0;
+
+	$$name0 = read_ncbi $genepool, 0, $ARGV[0];
+
+	send_message 'species', $$name0, 0;
+
+	my $stdout = *STDOUT{IO};
+	my $stderr = *STDERR{IO};
+
+	my @freenodz = @{ $metadata{nodes} };
+
+	my $count = 0;
+
+	for( @ARGV[1..$#ARGV] )
+	{
+		local $; = ';';
+
+		send_message 'file', $_;
+
+		$$name1 = read_ncbi $genepool, 0, $_;
+
+		send_message 'species', $$name1, 1;
+
+		# generate the output file.
+
+		my $base = "$Bin/../output/$$name0-$$name1-$metadata{maxlen}-$metadata{maxbad}.compare";
+
+		$base =~ s/\s+/_/g;
+
+		unless( $^P )
+		{
+			print "\nOutput files:\n$base.out\n$base.err\n";
+
+			open STDOUT, '>', $base . '.out';
+			open STDERR, '>', $base . '.err';
+
+			select STDOUT;
+		}
+
+		open my $table, '>', $base . '.html';
+
+		print $table 
+qq{
+<html>
+<head>
+<title>
+Listing of best-fit w-curves between $$name0 & $$name1 
+with length limit $metadata{maxlen},
+fit limit $metadata{maxbad}
+</title>
+</head>
+<body>
+
+<table cellPadding="4" border="1">
+<tr><th colspan=6>
+Comparison of $$name0, $$name1.
+<tr><th align=left colspan=6>
+<table border="0">
+<tr><td>Curve class used:   <td> $metadata{class}
+<tr><td>Length diff cutoff: <td> $metadata{maxlen}
+</table>
+<tr><th>&nbsp<th colspan=2>Mycoplasma genitalium<th colspan=2>Mycoplasma pneumoniae
+<tr rowspan=2>
+	<th>&nbsp
+	<th>Gene 0
+	<th>Length <br>BP
+	<th>Gene 1
+	<th>Length<br>BP
+	<th>Error Score
+};
+
+		for ( sort keys %{ $genepool->{$$name0} } )
+		{
+			DB::reset;
+
+			$$gene0 = $_;
+
+			my @resultz = ();
+
+			$$len0 = send_message 'gene', $$gene0, 0;
+
+			if( defined $$len0 )
+			{
+				for ( keys %{ $genepool->{$$name1} } )
+				{
+					$$gene1 = $_;
+
+					# fail will be true if a valid fitness measure
+					# is not available.
+
+					my $fail  = '';
+					my $fit = '';
+
+					if( ($$len1 = send_message 'gene', $$gene1, 1) < 0 )
+					{
+						$fail = '<length>';
+					}
+					elsif( ! defined ($fit = send_message 'compare') )
+					{
+						$fail = '<cutoff>';
+					}
+					else
+					{
+						# store the top two results for each gene -- 
+						# a tight enough cutoff may yield only one 
+						# result.
+
+						push @resultz, [ $$gene1, $$len1, $fit ];
+
+						@resultz = ( sort { $a->[-1] <=> $b->[-1] } @resultz )[0,1]
+							if @resultz > 1;
+					}
+
+					print join "\t", "\nResult:", $fail || $fit, @id
+						if !$fail || $::verbose;
+				}
+			}
+
+			if( @resultz )
+			{
+				++$count;
+
+				for
+				(
+					"<tr><td>$count<td>$$gene0<td>$$len0<td>",
+					"<tr><td>&nbsp<td>$$gene0<td>$$len0<td>",
+				)
+				{
+					print $table "\n", $_, join '<td>', @{shift @resultz}
+						if @resultz
+				}
+			}
+
+			$ENV{PERL_PROFILE_FILENAME} = "$base.$$gene0-prof";
+			DB::save;
+		}
+
+		# store profile for processing the organisms.
+
+		print $table qq{\n</table>\n</body>\n</html>\n};
+
+		close $table;
+
+		*STDOUT = \$stdout;
+		*STDERR = \$stderr;
+
+		select STDOUT;
+
+		send_message 'purge', $$name1;
+
+		delete $genepool->{$$name1};
+
+		print "\n\n", time2str "%Y.%m.%d %H:%M:%S Completed: $base", time;
+	}
+
+	# at this point $compare[0] == comparison of the first organism
+	# to itself, $comapre[1..N] == comparison to the other organisms.
+	#
+	# stop at the 0 in debug mode before wiping
+	# the package lexicals out of memory.
+}
+
+print "\n\n";
+
+# this isn't a module
+
+0
+
+__END__

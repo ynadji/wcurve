@@ -1,0 +1,58 @@
+#!/opt/bin/perl
+
+use strict;
+
+use Fatal qw( open close );
+
+use IO::File;
+
+my $input   = shift or die "Bogus $0: missing input path";
+my $output  = shift or die "Bogus $0: missing output path";
+
+-e $input   or die "Bogus $0: non-existant '$input'";
+-f $input   or die "Bogus $0: non-file '$input'";
+-r $input   or die "Bogus $0: un-readable '$input'";
+
+-e $output  or die "Bogus $0: non-existant '$output'";
+-d $output  or die "Bogus $0: non-directory '$output'";
+-w $output  or die "Bogus $0: un-writeable '$output'";
+
+my $src = IO::File->new;
+
+open $src, '-|', "/opt/bin/bzip -dc $input";
+
+# discard the first '>', which leaves the remaining 
+# ones as separators.
+
+$/ = ">";
+
+scalar <$src>;
+
+$/ = "\n>";
+
+my $fh  = IO::File->new;
+
+while( my $block = <$src> )
+{
+    chomp $block;
+
+    $block or next;
+
+    my ( $accno, $name ) = $block =~ m{ ^ ( \S+ ) \s+ ( [^;]+ ) }x
+    or next;
+
+    index $name, 'uncultured'
+    or next;
+
+    open $fh, '>', "$output/$accno.fasta";
+
+    print "Opening: $. : $accno\r";
+
+    print $fh '>', $block;
+
+    close $fh;
+}
+
+close $src;
+
+__END__

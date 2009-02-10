@@ -1,0 +1,157 @@
+#!/opt/bin/perl
+########################################################################
+# housekeeping
+########################################################################
+
+use strict;
+use feature qw( :5.10 );
+
+use File::Find;
+use FindBin::libs;
+
+use Benchmark   qw( :hireswallclock );
+use Fatal       qw( open close );
+use Time::HiRes qw( gettimeofday tv_interval );
+
+use WCurve;
+
+$\ = "\n";
+$, = "\t";
+$" = " ";
+
+########################################################################
+# package variables & sanity checks
+########################################################################
+
+@ARGV or die "Missing input file arguments";
+
+my @curvz   = ();
+my @identz  = ();
+
+my $uptri   = 1;
+
+my $cutoff  = 0 + shift
+or die "First argument is not a numeric cutoff";
+
+$cutoff > 0 or die "'$cutoff' is negative'";
+
+my $timz    = [ [ Init => Benchmark->new ] ];
+
+my $count   = 0;
+
+########################################################################
+# read all of the inputs into a hash by length, these will be
+# processed longest to shortest for comparision.
+########################################################################
+
+WCurve::limit $cutoff;
+
+select STDERR;
+$| = 1;
+
+print join "\n\t", 'Reading:', @ARGV, '';
+
+my $wanted
+= sub
+{
+    -d and return;
+
+    ++$count;
+
+    local $\;
+
+    print "Reading: $_ ($count)\n";
+
+    local $/;
+
+    open my $fh, '<', $_;
+
+    my ( $head, $seq ) = split /\n/, <$fh>, 2;
+
+    push @identz, $head =~ m{ ^ \W+ (\w+) }x;
+    
+    $seq    =~ s{ \W+ }{}gx;
+
+    eval
+    {
+        push @curvz, WCurve->generate( $seq );
+    }
+    or
+    warn "Skipped: $File::Find::name\n$@";
+
+    return
+};
+
+find $wanted, @ARGV;
+
+# at this point all of the sequences have
+# curves.
+
+push @$timz, [ Sort => Benchmark->new ];
+
+# given the curves by length, compare them
+# to one another.
+
+my $total   = $count * ( $count + 1 ) * 0.50;
+
+print "\n\nProcessing: $total comparisons with cutoff $cutoff\n\n";
+
+my $prior   = [ gettimeofday ];
+
+print STDOUT scalar @curvz;
+
+do
+{
+    for( 2 .. @curvz )
+    {
+        my $loop    = [ gettimeofday ];
+
+        my $head    = shift @curvz;
+        my $ident   = sprintf '%10.10s', shift @identz;
+
+        print STDOUT
+        $ident, map { WCurve::compare $head, $_ } @curvz;
+        
+        my $time    = tv_interval $loop, [gettimeofday];
+
+        my $comp    = 0.5 * @curvz * ( @curvz + 1 );
+        my $pct     = int ( 10_000 * $comp / $total ) / 100;
+        my $rate    = int( @curvz / $time );
+        my $time    = int( $comp / $rate );
+
+        print "Finished: $ident, Remaining: $comp ($pct\%) @ $rate Hz = ${time}s";
+    }
+
+    printf STDOUT "%-10.10s\n", $identz[0];
+};
+
+my $after   = [ gettimeofday ];
+
+push @$timz, [ Compare => Benchmark->new ];
+
+print "\n\nBenchmarks:";
+
+printf "%16s: %s\n", 'Total', timestr timediff $timz->[-1][1], $timz->[0][1];
+
+while( @$timz > 1 )
+{
+    my $t0 = shift @$timz;
+    my $t1 = $timz->[0];
+
+    my $time = timestr timediff $t1->[1], $t0->[1];
+
+    printf "%16s: %s\n", $t1->[0], $time;
+}
+
+my $time    = tv_interval $prior, $after;
+my $total   = $count * ( $count + 1 ) / 2;
+
+my $hz      = ( int $total / $time );
+
+print "\nAverage rate: $hz ($count seq, $total comp, $time sec)\t";
+
+print "\nExit";
+
+0
+
+__END__
